@@ -1,23 +1,28 @@
-import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
+import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Progress } from '@/components/ui/progress';
 import { 
   Users, 
   Building2, 
   Car,
-  Search, 
-  BarChart3,
-  UserPlus,
-  Building,
-  Plus,
+  DollarSign,
   TrendingUp,
-  Crown,
-  Shield,
-  ArrowRight
+  Target,
+  Calendar,
+  Bell,
+  Activity,
+  BarChart3,
+  PieChart,
+  ArrowRight,
+  Plus,
+  Phone,
+  Mail,
+  CheckCircle,
+  AlertTriangle
 } from 'lucide-react';
-import { UserMenu, useAuth } from '@/components/auth';
+import { useAuth } from '@/components/auth';
 import { useNavigate } from 'react-router-dom';
 
 export default function CRMDashboard() {
@@ -25,342 +30,521 @@ export default function CRMDashboard() {
   const navigate = useNavigate();
 
   // Mock data - em produção viria da API
-  const stats = {
-    totalContacts: 156,
-    totalCompanies: 43,
-    totalVehicles: 89,
-    totalMatches: 67,
-    contactsThisMonth: 12,
-    companiesThisMonth: 8,
-    vehiclesThisMonth: 15,
-    matchingRate: 78
+  const dashboardData = {
+    kpis: {
+      totalContacts: 156,
+      totalCompanies: 43,
+      totalVehicles: 89,
+      totalRevenue: 2450000,
+      monthlyGrowth: 15.3,
+      conversionRate: 23.5,
+      averageTicket: 45000,
+      activeOpportunities: 12
+    },
+    recentActivity: [
+      { 
+        id: '1',
+        type: 'contact_created',
+        title: 'Novo contato cadastrado',
+        description: 'João Silva Santos - CEO TechCorp',
+        time: '2 horas atrás',
+        icon: Users,
+        color: 'text-blue-600'
+      },
+      { 
+        id: '2',
+        type: 'opportunity_won',
+        title: 'Oportunidade fechada',
+        description: 'LogiBrasil - R$ 850.000 em veículos',
+        time: '4 horas atrás',
+        icon: DollarSign,
+        color: 'text-green-600'
+      },
+      { 
+        id: '3',
+        type: 'vehicle_added',
+        title: 'Veículo adicionado',
+        description: 'Ônibus Mercedes OF-1721 Paradiso',
+        time: '6 horas atrás',
+        icon: Car,
+        color: 'text-purple-600'
+      },
+      { 
+        id: '4',
+        type: 'task_completed',
+        title: 'Tarefa concluída',
+        description: 'Follow-up com InovaCorp realizado',
+        time: '1 dia atrás',
+        icon: CheckCircle,
+        color: 'text-green-600'
+      }
+    ],
+    upcomingTasks: [
+      {
+        id: '1',
+        title: 'Ligar para João Silva',
+        type: 'call',
+        dueDate: '2024-01-15T14:00:00',
+        priority: 'high',
+        relatedTo: 'TechCorp'
+      },
+      {
+        id: '2',
+        title: 'Enviar proposta LogiBrasil',
+        type: 'proposal',
+        dueDate: '2024-01-15T17:00:00',
+        priority: 'urgent',
+        relatedTo: 'LogiBrasil'
+      },
+      {
+        id: '3',
+        title: 'Reunião InovaCorp',
+        type: 'meeting',
+        dueDate: '2024-01-16T10:00:00',
+        priority: 'medium',
+        relatedTo: 'InovaCorp'
+      }
+    ],
+    salesPipeline: {
+      prospecting: { count: 8, value: 450000 },
+      qualification: { count: 5, value: 320000 },
+      proposal: { count: 3, value: 680000 },
+      negotiation: { count: 2, value: 890000 },
+      closed: { count: 4, value: 1200000 }
+    }
   };
 
-  const recentActivity = [
-    { type: 'contact', action: 'Novo contato cadastrado: João Silva', time: '2 horas atrás', icon: Users },
-    { type: 'company', action: 'Empresa atualizada: Tech Solutions', time: '4 horas atrás', icon: Building2 },
-    { type: 'vehicle', action: 'Veículo cadastrado: Ônibus Mercedes', time: '6 horas atrás', icon: Car },
-    { type: 'match', action: 'Correspondência confirmada', time: '1 dia atrás', icon: Search },
-    { type: 'company', action: 'Nova empresa: Inovação Digital', time: '2 dias atrás', icon: Building2 }
-  ];
+  const formatCurrency = (value: number) => {
+    return new Intl.NumberFormat('pt-BR', {
+      style: 'currency',
+      currency: 'BRL'
+    }).format(value);
+  };
+
+  const getPriorityColor = (priority: string) => {
+    switch (priority) {
+      case 'urgent': return 'bg-red-100 text-red-800';
+      case 'high': return 'bg-orange-100 text-orange-800';
+      case 'medium': return 'bg-yellow-100 text-yellow-800';
+      case 'low': return 'bg-green-100 text-green-800';
+      default: return 'bg-gray-100 text-gray-800';
+    }
+  };
+
+  const getTaskIcon = (type: string) => {
+    switch (type) {
+      case 'call': return <Phone className="h-3 w-3" />;
+      case 'email': return <Mail className="h-3 w-3" />;
+      case 'meeting': return <Calendar className="h-3 w-3" />;
+      default: return <Activity className="h-3 w-3" />;
+    }
+  };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
+    <div className="p-6 space-y-6">
       {/* Header */}
-      <div className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className={`w-10 h-10 ${isAurovel ? 'bg-gradient-to-r from-purple-600 to-indigo-600' : 'bg-gradient-to-r from-blue-600 to-indigo-600'} rounded-lg flex items-center justify-center`}>
-                {isAurovel ? <Crown className="h-6 w-6 text-white" /> : <Shield className="h-6 w-6 text-white" />}
-              </div>
-              <div>
-                <h1 className="text-2xl font-bold text-gray-900">
-                  {isAurovel ? 'CRM Master Control' : 'Sistema CRM'}
-                </h1>
-                <p className="text-sm text-gray-600">
-                  {isAurovel ? 'Controle Total - Aurovel' : `${user?.companyData.name}`}
-                </p>
-              </div>
-            </div>
-            <div className="flex items-center gap-2">
-              {isAurovel && (
-                <Badge variant="default" className="bg-purple-600">
-                  <Crown className="h-3 w-3 mr-1" />
-                  Controle Total
-                </Badge>
-              )}
-              <UserMenu />
-            </div>
-          </div>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">Dashboard CRM</h1>
+          <p className="text-gray-600">
+            Bem-vindo, {user?.name} • {user?.companyData.name}
+          </p>
+        </div>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" size="sm">
+            <Bell className="h-4 w-4 mr-2" />
+            Notificações
+            <Badge variant="secondary" className="ml-2">3</Badge>
+          </Button>
         </div>
       </div>
 
-      {/* Access Control Info */}
-      {isAurovel && (
-        <div className="max-w-7xl mx-auto px-6 py-2">
-          <Alert className="border-purple-200 bg-purple-50">
-            <Crown className="h-4 w-4 text-purple-600" />
-            <AlertDescription className="text-purple-800">
-              <strong>Modo Aurovel:</strong> Você tem controle total do sistema e pode acessar dados de todas as empresas.
-            </AlertDescription>
-          </Alert>
-        </div>
-      )}
+      {/* KPIs Principais */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate('/contacts')}>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Contatos (PF)</CardTitle>
+            <Users className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-blue-600">{dashboardData.kpis.totalContacts}</div>
+            <p className="text-xs text-muted-foreground">
+              +12 este mês
+            </p>
+          </CardContent>
+        </Card>
 
-      {/* Main Content */}
-      <div className="max-w-7xl mx-auto p-6">
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <Card className="hover:shadow-lg transition-shadow">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Contatos (PF)</CardTitle>
-              <Users className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-blue-600">{stats.totalContacts}</div>
-              <p className="text-xs text-muted-foreground">
-                +{stats.contactsThisMonth} este mês
-              </p>
-            </CardContent>
-          </Card>
+        <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate('/companies')}>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Empresas (PJ)</CardTitle>
+            <Building2 className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-green-600">{dashboardData.kpis.totalCompanies}</div>
+            <p className="text-xs text-muted-foreground">
+              +8 este mês
+            </p>
+          </CardContent>
+        </Card>
 
-          <Card className="hover:shadow-lg transition-shadow">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Empresas (PJ)</CardTitle>
-              <Building2 className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-green-600">{stats.totalCompanies}</div>
-              <p className="text-xs text-muted-foreground">
-                +{stats.companiesThisMonth} este mês
-              </p>
-            </CardContent>
-          </Card>
+        <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate('/vehicles')}>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Veículos</CardTitle>
+            <Car className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-purple-600">{dashboardData.kpis.totalVehicles}</div>
+            <p className="text-xs text-muted-foreground">
+              +15 este mês
+            </p>
+          </CardContent>
+        </Card>
 
-          <Card className="hover:shadow-lg transition-shadow">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Veículos</CardTitle>
-              <Car className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-purple-600">{stats.totalVehicles}</div>
-              <p className="text-xs text-muted-foreground">
-                +{stats.vehiclesThisMonth} este mês
-              </p>
-            </CardContent>
-          </Card>
+        <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate('/sales')}>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Receita</CardTitle>
+            <DollarSign className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-orange-600">
+              {formatCurrency(dashboardData.kpis.totalRevenue)}
+            </div>
+            <p className="text-xs text-muted-foreground">
+              +{dashboardData.kpis.monthlyGrowth}% este mês
+            </p>
+          </CardContent>
+        </Card>
+      </div>
 
-          <Card className="hover:shadow-lg transition-shadow">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Correspondências</CardTitle>
-              <TrendingUp className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-orange-600">{stats.totalMatches}</div>
-              <p className="text-xs text-muted-foreground">
-                {stats.matchingRate}% taxa de match
-              </p>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Quick Actions */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate('/contacts/new')}>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-blue-600">
-                <UserPlus className="h-5 w-5" />
-                Novo Contato
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground mb-4">
-                Cadastrar pessoa física com wizard completo
-              </p>
-              <Button className="w-full">
-                <Plus className="h-4 w-4 mr-2" />
-                Cadastrar PF
-              </Button>
-            </CardContent>
-          </Card>
-
-          <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate('/companies/new')}>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-green-600">
-                <Building className="h-5 w-5" />
-                Nova Empresa
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground mb-4">
-                Cadastrar pessoa jurídica com wizard completo
-              </p>
-              <Button variant="outline" className="w-full">
-                <Plus className="h-4 w-4 mr-2" />
-                Cadastrar PJ
-              </Button>
-            </CardContent>
-          </Card>
-
-          <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate('/vehicles/new')}>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-purple-600">
-                <Car className="h-5 w-5" />
-                Novo Veículo
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground mb-4">
-                Cadastrar veículo com wizard completo
-              </p>
-              <Button variant="outline" className="w-full">
-                <Plus className="h-4 w-4 mr-2" />
-                Cadastrar Veículo
-              </Button>
-            </CardContent>
-          </Card>
-
-          <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate('/matching')}>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-orange-600">
-                <Search className="h-5 w-5" />
-                Smart Matching
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground mb-4">
-                Correspondência inteligente PJ × PF
-              </p>
-              <Button variant="outline" className="w-full">
-                <TrendingUp className="h-4 w-4 mr-2" />
-                Executar Matching
-              </Button>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Main Content Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Recent Activity */}
-          <Card className="lg:col-span-2">
-            <CardHeader>
+      {/* Conteúdo Principal */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Pipeline de Vendas */}
+        <Card className="lg:col-span-2">
+          <CardHeader>
+            <div className="flex items-center justify-between">
               <CardTitle className="flex items-center gap-2">
-                <BarChart3 className="h-5 w-5" />
-                Atividade Recente
+                <Target className="h-5 w-5" />
+                Pipeline de Vendas
               </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {recentActivity.map((activity, index) => {
-                const Icon = activity.icon;
+              <Button variant="outline" size="sm" onClick={() => navigate('/sales')}>
+                Ver Detalhes
+                <ArrowRight className="h-4 w-4 ml-2" />
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {Object.entries(dashboardData.salesPipeline).map(([stage, data]) => {
+                const stageLabels = {
+                  prospecting: 'Prospecção',
+                  qualification: 'Qualificação',
+                  proposal: 'Proposta',
+                  negotiation: 'Negociação',
+                  closed: 'Fechado'
+                };
+                
+                const stageColors = {
+                  prospecting: 'bg-gray-500',
+                  qualification: 'bg-blue-500',
+                  proposal: 'bg-yellow-500',
+                  negotiation: 'bg-orange-500',
+                  closed: 'bg-green-500'
+                };
+
                 return (
-                  <div key={index} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                      activity.type === 'contact' ? 'bg-blue-100 text-blue-600' :
-                      activity.type === 'company' ? 'bg-green-100 text-green-600' :
-                      activity.type === 'vehicle' ? 'bg-purple-100 text-purple-600' :
-                      'bg-orange-100 text-orange-600'
-                    }`}>
-                      <Icon className="h-4 w-4" />
+                  <div key={stage} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                    <div className="flex items-center gap-3">
+                      <div className={`w-3 h-3 rounded-full ${stageColors[stage as keyof typeof stageColors]}`} />
+                      <span className="font-medium">{stageLabels[stage as keyof typeof stageLabels]}</span>
                     </div>
-                    <div className="flex-1">
-                      <p className="text-sm font-medium">{activity.action}</p>
-                      <p className="text-xs text-muted-foreground">{activity.time}</p>
+                    <div className="text-right">
+                      <p className="font-bold">{data.count} oportunidades</p>
+                      <p className="text-sm text-muted-foreground">{formatCurrency(data.value)}</p>
                     </div>
                   </div>
                 );
               })}
-            </CardContent>
-          </Card>
+            </div>
+          </CardContent>
+        </Card>
 
-          {/* Navigation Menu */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Navegação Rápida</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <Button 
-                variant="ghost" 
-                className="w-full justify-between"
-                onClick={() => navigate('/contacts')}
-              >
-                <div className="flex items-center gap-2">
-                  <Users className="h-4 w-4" />
-                  Gerenciar Contatos
-                </div>
-                <ArrowRight className="h-4 w-4" />
-              </Button>
-
-              <Button 
-                variant="ghost" 
-                className="w-full justify-between"
-                onClick={() => navigate('/companies')}
-              >
-                <div className="flex items-center gap-2">
-                  <Building2 className="h-4 w-4" />
-                  Gerenciar Empresas
-                </div>
-                <ArrowRight className="h-4 w-4" />
-              </Button>
-
-              <Button 
-                variant="ghost" 
-                className="w-full justify-between"
-                onClick={() => navigate('/vehicles')}
-              >
-                <div className="flex items-center gap-2">
-                  <Car className="h-4 w-4" />
-                  Gerenciar Veículos
-                </div>
-                <ArrowRight className="h-4 w-4" />
-              </Button>
-
-              <Button 
-                variant="ghost" 
-                className="w-full justify-between"
-                onClick={() => navigate('/matching')}
-              >
-                <div className="flex items-center gap-2">
-                  <Search className="h-4 w-4" />
-                  Sistema de Matching
-                </div>
-                <ArrowRight className="h-4 w-4" />
-              </Button>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* System Info */}
-        <Card className="mt-6">
+        {/* Tarefas Pendentes */}
+        <Card>
           <CardHeader>
-            <CardTitle>📋 Sistema CRM Completo</CardTitle>
+            <div className="flex items-center justify-between">
+              <CardTitle className="flex items-center gap-2">
+                <Calendar className="h-5 w-5" />
+                Próximas Tarefas
+              </CardTitle>
+              <Button variant="outline" size="sm" onClick={() => navigate('/tasks')}>
+                Ver Todas
+              </Button>
+            </div>
           </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div>
-                <h4 className="font-semibold mb-2 text-blue-600">👥 Módulo Contatos (PF)</h4>
-                <ul className="text-sm space-y-1 text-muted-foreground">
-                  <li>• Wizard de 9 etapas completas</li>
-                  <li>• Validação CPF, email, CEP</li>
-                  <li>• Dados pessoais, documentos, endereço</li>
-                  <li>• Informações profissionais e financeiras</li>
-                  <li>• Sistema de compliance e KYC</li>
-                </ul>
+          <CardContent className="space-y-3">
+            {dashboardData.upcomingTasks.map(task => (
+              <div key={task.id} className="border rounded-lg p-3">
+                <div className="flex items-start justify-between mb-2">
+                  <h4 className="font-medium text-sm">{task.title}</h4>
+                  <Badge className={getPriorityColor(task.priority)} size="sm">
+                    {task.priority.toUpperCase()}
+                  </Badge>
+                </div>
+                <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                  {getTaskIcon(task.type)}
+                  <span>{new Date(task.dueDate).toLocaleString('pt-BR')}</span>
+                </div>
+                <p className="text-xs text-muted-foreground mt-1">{task.relatedTo}</p>
               </div>
-              
-              <div>
-                <h4 className="font-semibold mb-2 text-green-600">🏢 Módulo Empresas (PJ)</h4>
-                <ul className="text-sm space-y-1 text-muted-foreground">
-                  <li>• Wizard de 11 etapas completas</li>
-                  <li>• Validação CNPJ e dados comerciais</li>
-                  <li>• Estrutura societária completa</li>
-                  <li>• Informações financeiras e bancárias</li>
-                  <li>• Licenças, seguros e compliance</li>
-                </ul>
+            ))}
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Atividade Recente e Ações Rápidas */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Atividade Recente */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Activity className="h-5 w-5" />
+              Atividade Recente
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {dashboardData.recentActivity.map(activity => {
+              const Icon = activity.icon;
+              return (
+                <div key={activity.id} className="flex items-center gap-3">
+                  <div className={`w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center ${activity.color}`}>
+                    <Icon className="h-4 w-4" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="font-medium text-sm">{activity.title}</p>
+                    <p className="text-xs text-muted-foreground">{activity.description}</p>
+                    <p className="text-xs text-muted-foreground">{activity.time}</p>
+                  </div>
+                </div>
+              );
+            })}
+          </CardContent>
+        </Card>
+
+        {/* Ações Rápidas */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Ações Rápidas</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <Button 
+              className="w-full justify-start h-12"
+              onClick={() => navigate('/contacts/new')}
+            >
+              <Users className="h-4 w-4 mr-3" />
+              <div className="text-left">
+                <p className="font-medium">Cadastrar Contato</p>
+                <p className="text-xs opacity-80">Wizard completo PF</p>
               </div>
-              
+            </Button>
+
+            <Button 
+              variant="outline" 
+              className="w-full justify-start h-12"
+              onClick={() => navigate('/companies/new')}
+            >
+              <Building2 className="h-4 w-4 mr-3" />
+              <div className="text-left">
+                <p className="font-medium">Cadastrar Empresa</p>
+                <p className="text-xs opacity-60">Wizard completo PJ</p>
+              </div>
+            </Button>
+
+            <Button 
+              variant="outline" 
+              className="w-full justify-start h-12"
+              onClick={() => navigate('/vehicles/new')}
+            >
+              <Car className="h-4 w-4 mr-3" />
+              <div className="text-left">
+                <p className="font-medium">Cadastrar Veículo</p>
+                <p className="text-xs opacity-60">Wizard completo</p>
+              </div>
+            </Button>
+
+            <Button 
+              variant="outline" 
+              className="w-full justify-start h-12"
+              onClick={() => navigate('/matching')}
+            >
+              <Target className="h-4 w-4 mr-3" />
+              <div className="text-left">
+                <p className="font-medium">Smart Matching</p>
+                <p className="text-xs opacity-60">Correspondência IA</p>
+              </div>
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Métricas Avançadas */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <BarChart3 className="h-5 w-5" />
+              Performance Geral
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-3">
               <div>
-                <h4 className="font-semibold mb-2 text-purple-600">🚗 Módulo Veículos</h4>
-                <ul className="text-sm space-y-1 text-muted-foreground">
-                  <li>• Wizard de 11 etapas completas</li>
-                  <li>• Categorias: ônibus, caminhões, carros</li>
-                  <li>• Upload de mídia e documentos</li>
-                  <li>• Configuração de opcionais</li>
-                  <li>• Localização e descrição</li>
-                </ul>
+                <div className="flex justify-between text-sm mb-1">
+                  <span>Taxa de Conversão</span>
+                  <span className="font-medium">{dashboardData.kpis.conversionRate}%</span>
+                </div>
+                <Progress value={dashboardData.kpis.conversionRate} className="h-2" />
+              </div>
+
+              <div>
+                <div className="flex justify-between text-sm mb-1">
+                  <span>Crescimento Mensal</span>
+                  <span className="font-medium text-green-600">+{dashboardData.kpis.monthlyGrowth}%</span>
+                </div>
+                <Progress value={dashboardData.kpis.monthlyGrowth} className="h-2" />
+              </div>
+
+              <div className="pt-2 border-t">
+                <p className="text-sm text-muted-foreground">Ticket Médio</p>
+                <p className="text-lg font-bold text-blue-600">
+                  {formatCurrency(dashboardData.kpis.averageTicket)}
+                </p>
               </div>
             </div>
-            
-            <div className="mt-6 p-4 bg-orange-50 rounded-lg">
-              <h4 className="font-semibold mb-2 text-orange-600">🤖 Sistema de Matching Inteligente</h4>
-              <p className="text-sm text-orange-800">
-                Algoritmo avançado para relacionar automaticamente contatos (PF) com empresas (PJ) 
-                baseado em domínio de email, localização, cargo e outros critérios inteligentes.
-              </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <PieChart className="h-5 w-5" />
+              Distribuição de Dados
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 bg-blue-500 rounded-full" />
+                  <span className="text-sm">Contatos</span>
+                </div>
+                <span className="font-medium">{dashboardData.kpis.totalContacts}</span>
+              </div>
+              
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 bg-green-500 rounded-full" />
+                  <span className="text-sm">Empresas</span>
+                </div>
+                <span className="font-medium">{dashboardData.kpis.totalCompanies}</span>
+              </div>
+              
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 bg-purple-500 rounded-full" />
+                  <span className="text-sm">Veículos</span>
+                </div>
+                <span className="font-medium">{dashboardData.kpis.totalVehicles}</span>
+              </div>
+
+              <div className="pt-2 border-t">
+                <p className="text-sm text-muted-foreground">Total de Registros</p>
+                <p className="text-lg font-bold">
+                  {dashboardData.kpis.totalContacts + dashboardData.kpis.totalCompanies + dashboardData.kpis.totalVehicles}
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <TrendingUp className="h-5 w-5" />
+              Oportunidades Ativas
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div className="text-center">
+                <p className="text-3xl font-bold text-orange-600">{dashboardData.kpis.activeOpportunities}</p>
+                <p className="text-sm text-muted-foreground">oportunidades em andamento</p>
+              </div>
+              
+              <div className="space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span>Valor Total Pipeline</span>
+                  <span className="font-medium">{formatCurrency(2340000)}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span>Valor Ponderado</span>
+                  <span className="font-medium text-green-600">{formatCurrency(1560000)}</span>
+                </div>
+              </div>
+
+              <Button variant="outline" className="w-full" onClick={() => navigate('/sales')}>
+                Gerenciar Pipeline
+                <ArrowRight className="h-4 w-4 ml-2" />
+              </Button>
             </div>
           </CardContent>
         </Card>
       </div>
+
+      {/* Alertas e Notificações */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Bell className="h-5 w-5" />
+            Alertas e Notificações
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-3">
+            <div className="flex items-center gap-3 p-3 bg-red-50 border border-red-200 rounded-lg">
+              <AlertTriangle className="h-5 w-5 text-red-600" />
+              <div className="flex-1">
+                <p className="font-medium text-red-800">3 tarefas vencidas</p>
+                <p className="text-sm text-red-600">Verifique suas tarefas pendentes</p>
+              </div>
+              <Button size="sm" variant="outline" onClick={() => navigate('/tasks')}>
+                Ver Tarefas
+              </Button>
+            </div>
+
+            <div className="flex items-center gap-3 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+              <Calendar className="h-5 w-5 text-yellow-600" />
+              <div className="flex-1">
+                <p className="font-medium text-yellow-800">5 follow-ups hoje</p>
+                <p className="text-sm text-yellow-600">Contatos agendados para hoje</p>
+              </div>
+              <Button size="sm" variant="outline">
+                Ver Agenda
+              </Button>
+            </div>
+
+            <div className="flex items-center gap-3 p-3 bg-green-50 border border-green-200 rounded-lg">
+              <CheckCircle className="h-5 w-5 text-green-600" />
+              <div className="flex-1">
+                <p className="font-medium text-green-800">Meta mensal: 85% atingida</p>
+                <p className="text-sm text-green-600">Faltam apenas 3 vendas para bater a meta</p>
+              </div>
+              <Button size="sm" variant="outline" onClick={() => navigate('/reports')}>
+                Ver Relatório
+              </Button>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }
