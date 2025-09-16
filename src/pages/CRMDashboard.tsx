@@ -395,6 +395,20 @@ export default function CRMDashboard() {
                 <p className="text-xs opacity-60">Correspondência IA</p>
               </div>
             </Button>
+
+            {(hasPermission('users', 'create') || hasPermission('users', 'read')) && (
+              <Button 
+                variant="outline" 
+                className="w-full justify-start h-12"
+                onClick={() => navigate('/admin/users')}
+              >
+                <Users className="h-4 w-4 mr-3" />
+                <div className="text-left">
+                  <p className="font-medium">Gerenciar Usuários</p>
+                  <p className="text-xs opacity-60">Cadastro e controle</p>
+                </div>
+              </Button>
+            )}
           </CardContent>
         </Card>
       </div>

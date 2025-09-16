@@ -232,6 +232,37 @@ export default function MainLayout() {
               </SidebarGroupContent>
             </SidebarGroup>
 
+            {/* Admin Section */}
+            {(isSuperAdmin || isCompanyAdmin) && (
+              <SidebarGroup>
+                <SidebarGroupLabel>Administração</SidebarGroupLabel>
+                <SidebarGroupContent>
+                  <SidebarMenu>
+                    <SidebarMenuItem>
+                      <SidebarMenuButton
+                        onClick={() => navigate('/admin')}
+                        isActive={isActivePath('/admin')}
+                        tooltip="Painel administrativo"
+                      >
+                        <Shield className="h-4 w-4" />
+                        <span>Painel Admin</span>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                    <SidebarMenuItem>
+                      <SidebarMenuButton
+                        onClick={() => navigate('/admin/users')}
+                        isActive={isActivePath('/admin/users')}
+                        tooltip="Gerenciar usuários"
+                      >
+                        <Users className="h-4 w-4" />
+                        <span>Usuários</span>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  </SidebarMenu>
+                </SidebarGroupContent>
+              </SidebarGroup>
+            )}
+
             {/* Quick Stats */}
             <SidebarGroup>
               <SidebarGroupLabel>Estatísticas Rápidas</SidebarGroupLabel>

@@ -222,6 +222,25 @@ export const UserCRUD: React.FC<UserCRUDProps> = ({ className = "" }) => {
       toast.error(error.message || 'Erro ao alterar status');
     }
   };
+  const handleToggleStatus = async (user: User) => {
+    if (!currentUser) return;
+
+    try {
+      const updatedUser = await userService.toggleUserStatus(user.id, currentUser);
+      
+      await userService.logUserAction(currentUser.id, 'user_status_changed', {
+        targetUserId: user.id,
+        newStatus: updatedUser.isActive ? 'active' : 'inactive'
+      });
+
+      setUsers(prev => prev.map(u => u.id === updatedUser.id ? updatedUser : u));
+      
+      toast.success(`Usuário ${updatedUser.isActive ? 'ativado' : 'desativado'} com sucesso!`);
+      loadData();
+    } catch (error: any) {
+      toast.error(error.message || 'Erro ao alterar status');
+    }
+  };
 
   const handleChangePassword = async () => {
     if (!currentUser || !selectedUser) return;
@@ -254,6 +273,22 @@ export const UserCRUD: React.FC<UserCRUDProps> = ({ className = "" }) => {
     }
   };
 
+  const handleForceLogout = async (user: User) => {
+    if (!currentUser) return;
+
+    try {
+      await userService.invalidateAllUserSessions(user.id);
+      
+      await userService.logUserAction(currentUser.id, 'force_logout', {
+        targetUserId: user.id,
+        targetUserEmail: user.email
+      });
+
+      toast.success(`Logout forçado para ${user.name}`);
+    } catch (error: any) {
+      toast.error(error.message || 'Erro ao forçar logout');
+    }
+  };
   const handleForceLogout = async (user: User) => {
     if (!currentUser) return;
 

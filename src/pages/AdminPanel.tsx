@@ -251,12 +251,6 @@ export default function AdminPanel() {
                     </div>
                   </CardContent>
                 </Card>
-                <LogoutButton 
-                  variant="ghost" 
-                  size="sm" 
-                  showText={false}
-                  className="text-red-600 hover:text-red-600 hover:bg-red-50"
-                />
               </div>
             } 
           />
