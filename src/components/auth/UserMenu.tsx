@@ -17,9 +17,11 @@ import {
   Building2, 
   Shield,
   Users,
-  ChevronDown
+  ChevronDown,
+  User as UserIcon
 } from 'lucide-react';
 import { useAuth } from './AuthContext';
+import { LogoutButton } from './LogoutButton';
 import { toast } from 'sonner';
 import { UserRole } from '@/types/auth';
 
@@ -31,11 +33,6 @@ export const UserMenu: React.FC<UserMenuProps> = ({ className = "" }) => {
   const { user, company, logout, isAurovel, isSuperAdmin, isCompanyAdmin, switchCompany } = useAuth();
 
   if (!user || !company) return null;
-
-  const handleLogout = () => {
-    logout();
-    toast.success('Logout realizado com sucesso');
-  };
 
   const handleCompanySwitch = async (companyId: string) => {
     try {
@@ -164,6 +161,11 @@ export const UserMenu: React.FC<UserMenuProps> = ({ className = "" }) => {
           <span>Configurações</span>
         </DropdownMenuItem>
         
+        <DropdownMenuItem className="cursor-pointer">
+          <UserIcon className="mr-2 h-4 w-4" />
+          <span>Meu Perfil</span>
+        </DropdownMenuItem>
+        
         {isCompanyAdmin && (
           <DropdownMenuItem className="cursor-pointer">
             <Users className="mr-2 h-4 w-4" />
@@ -173,13 +175,13 @@ export const UserMenu: React.FC<UserMenuProps> = ({ className = "" }) => {
         
         <DropdownMenuSeparator />
         
-        <DropdownMenuItem 
-          className="cursor-pointer text-red-600 focus:text-red-600"
-          onClick={handleLogout}
-        >
-          <LogOut className="mr-2 h-4 w-4" />
-          <span>Sair</span>
-        </DropdownMenuItem>
+        <div className="p-1">
+          <LogoutButton 
+            variant="ghost" 
+            size="sm" 
+            className="w-full justify-start text-red-600 hover:text-red-600 hover:bg-red-50"
+          />
+        </div>
       </DropdownMenuContent>
     </DropdownMenu>
   );

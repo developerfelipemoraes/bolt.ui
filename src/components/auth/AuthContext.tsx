@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { User, Company, AuthContextType, UserRole, PermissionAction, ROLE_PERMISSIONS } from '@/types/auth';
+import { userService } from '@/services/userService';
 import { toast } from 'sonner';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -11,40 +12,68 @@ interface AuthProviderProps {
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [company, setCompany] = useState<Company | null>(null);
-  const [availableCompanies, setAvailableCompanies] = useState<Company[]>([]);
+  const [sessionId, setSessionId] = useState<string | null>(null);
 
   useEffect(() => {
-    // Verificar se há usuário e empresa salvos no localStorage
+    // Verificar se há sessão ativa
     const savedUser = localStorage.getItem('user');
     const savedCompany = localStorage.getItem('company');
+    const savedSessionId = localStorage.getItem('sessionId');
     
-    if (savedUser && savedCompany) {
+    if (savedUser && savedCompany && savedSessionId) {
       try {
         const userData = JSON.parse(savedUser);
         const companyData = JSON.parse(savedCompany);
         setUser(userData);
         setCompany(companyData);
+        setSessionId(savedSessionId);
+        
+        // Validar sessão
+        userService.validateSession(savedSessionId).then(result => {
+          if (!result) {
+            // Sessão inválida, fazer logout
+            logout();
+            toast.error('Sessão expirada. Faça login novamente.');
+          }
+        });
       } catch (error) {
         console.error('Erro ao carregar dados do usuário:', error);
-        localStorage.removeItem('user');
-        localStorage.removeItem('company');
+        logout();
       }
     }
   }, []);
 
-  const login = (userData: User, companyData: Company) => {
+  const login = async (userData: User, companyData: Company) => {
+    // Criar sessão
+    const newSessionId = await userService.createSession(userData, companyData);
+    
     setUser(userData);
     setCompany(companyData);
+    setSessionId(newSessionId);
+    
     localStorage.setItem('user', JSON.stringify(userData));
     localStorage.setItem('company', JSON.stringify(companyData));
+    localStorage.setItem('sessionId', newSessionId);
+
+    // Log da ação de login
+    await userService.logUserAction(userData.id, 'user_login', {
+      companyId: companyData.id,
+      sessionId: newSessionId
+    });
   };
 
-  const logout = () => {
+  const logout = async () => {
+    if (sessionId) {
+      await userService.invalidateSession(sessionId);
+    }
+    
     setUser(null);
     setCompany(null);
+    setSessionId(null);
+    
     localStorage.removeItem('user');
     localStorage.removeItem('company');
-    localStorage.removeItem('availableCompanies');
+    localStorage.removeItem('sessionId');
   };
 
   const hasPermission = (resource: string, action: PermissionAction): boolean => {
@@ -98,47 +127,18 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       throw new Error('Apenas super admin pode trocar de empresa');
     }
     
-    // Aqui faria a busca da empresa na API
-    // Por enquanto, simulando com dados mock
-    const mockCompanies: Company[] = [
-      {
-        id: 'aurovel',
-        name: 'Aurovel',
-        type: 'master',
-        logo: '👑',
-        description: 'Controle Total do Sistema',
-        settings: {
-          maxUsers: 1000,
-          allowedModules: ['all'],
-          customBranding: true,
-          dataRetentionDays: 365
-        },
-        isActive: true,
-        createdAt: '2024-01-01',
-        updatedAt: '2024-01-01'
-      },
-      {
-        id: 'tech-solutions',
-        name: 'Tech Solutions Ltda',
-        type: 'client',
-        logo: '🏢',
-        description: 'Empresa Cliente',
-        settings: {
-          maxUsers: 50,
-          allowedModules: ['contacts', 'companies', 'vehicles'],
-          customBranding: false,
-          dataRetentionDays: 90
-        },
-        isActive: true,
-        createdAt: '2024-01-01',
-        updatedAt: '2024-01-01'
-      }
-    ];
-    
-    const targetCompany = mockCompanies.find(c => c.id === companyId);
+    const targetCompany = await userService.getCompanyById(companyId);
     if (targetCompany) {
       setCompany(targetCompany);
       localStorage.setItem('company', JSON.stringify(targetCompany));
+      
+      // Log da troca de empresa
+      await userService.logUserAction(user.id, 'company_switched', {
+        fromCompanyId: company?.id,
+        toCompanyId: companyId,
+        toCompanyName: targetCompany.name
+      });
+      
       toast.success(`Empresa alterada para: ${targetCompany.name}`);
     }
   };

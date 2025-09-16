@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { User, Company, UserRole } from '@/types/auth';
+import { userService } from '@/services/userService';
 
 interface LoginData {
   email: string;
@@ -29,123 +30,6 @@ interface LoginComponentProps {
   onLogin: (userData: User, companyData: Company) => void;
   className?: string;
 }
-// Dados mockados das empresas e usuários
-const COMPANIES: Record<string, Company> = {
-  'aurovel': {
-    id: 'aurovel',
-    name: 'Aurovel',
-    type: 'master',
-    logo: '👑',
-    description: 'Controle Total do Sistema',
-    settings: {
-      maxUsers: 1000,
-      allowedModules: ['all'],
-      customBranding: true,
-      dataRetentionDays: 365
-    },
-    isActive: true,
-    createdAt: '2024-01-01',
-    updatedAt: '2024-01-01'
-  },
-  'tech-solutions': {
-    id: 'tech-solutions', 
-    name: 'Tech Solutions Ltda',
-    type: 'client',
-    logo: '🏢',
-    description: 'Empresa Cliente',
-    settings: {
-      maxUsers: 50,
-      allowedModules: ['contacts', 'companies', 'vehicles'],
-      customBranding: false,
-      dataRetentionDays: 90
-    },
-    isActive: true,
-    createdAt: '2024-01-01',
-    updatedAt: '2024-01-01'
-  },
-  'inovacao-digital': {
-    id: 'inovacao-digital',
-    name: 'Inovação Digital S.A.',
-    type: 'client', 
-    logo: '💡',
-    description: 'Empresa Cliente',
-    settings: {
-      maxUsers: 25,
-      allowedModules: ['contacts', 'companies'],
-      customBranding: false,
-      dataRetentionDays: 60
-    },
-    isActive: true,
-    createdAt: '2024-01-01',
-    updatedAt: '2024-01-01'
-  }
-};
-
-const USERS: User[] = [
-  // Usuários Aurovel (controle total)
-  {
-    id: '1',
-    email: 'admin@aurovel.com',
-    password: 'admin123',
-    name: 'Administrador Aurovel',
-    companyId: 'aurovel',
-    role: UserRole.SUPER_ADMIN,
-    permissions: [],
-    isActive: true,
-    createdAt: '2024-01-01',
-    updatedAt: '2024-01-01'
-  },
-  {
-    id: '2', 
-    email: 'manager@aurovel.com',
-    password: 'manager123',
-    name: 'Gerente Aurovel',
-    companyId: 'aurovel',
-    role: UserRole.SUPER_ADMIN,
-    permissions: [],
-    isActive: true,
-    createdAt: '2024-01-01',
-    updatedAt: '2024-01-01'
-  },
-  // Usuários Tech Solutions
-  {
-    id: '3',
-    email: 'admin@techsolutions.com',
-    password: 'tech123',
-    name: 'Admin Tech Solutions',
-    companyId: 'tech-solutions',
-    role: UserRole.COMPANY_ADMIN,
-    permissions: [],
-    isActive: true,
-    createdAt: '2024-01-01',
-    updatedAt: '2024-01-01'
-  },
-  {
-    id: '4',
-    email: 'user@techsolutions.com', 
-    password: 'user123',
-    name: 'Usuário Tech Solutions',
-    companyId: 'tech-solutions',
-    role: UserRole.USER,
-    permissions: [],
-    isActive: true,
-    createdAt: '2024-01-01',
-    updatedAt: '2024-01-01'
-  },
-  // Usuários Inovação Digital
-  {
-    id: '5',
-    email: 'admin@inovacaodigital.com',
-    password: 'inov123',
-    name: 'Admin Inovação Digital',
-    companyId: 'inovacao-digital',
-    role: UserRole.COMPANY_ADMIN,
-    permissions: [],
-    isActive: true,
-    createdAt: '2024-01-01',
-    updatedAt: '2024-01-01'
-  }
-];
 
 export const LoginComponent: React.FC<LoginComponentProps> = ({ onLogin, className = "" }) => {
   const [loginData, setLoginData] = useState<LoginData>({
@@ -167,22 +51,17 @@ export const LoginComponent: React.FC<LoginComponentProps> = ({ onLogin, classNa
       // Simular delay de autenticação
       await new Promise(resolve => setTimeout(resolve, 1000));
 
-      let user = null;
+      let authResult = null;
 
       if (loginType === 'email') {
         // Login por email/senha
-        user = USERS.find((u: any) => 
-          u.email === loginData.email && 
-          u.password === loginData.password
-        );
+        authResult = await userService.authenticate(loginData.email, loginData.password);
       } else {
         // Login por empresa (apenas Aurovel)
-        if (loginData.company === 'aurovel' && loginData.password === 'aurovel2024') {
-          user = USERS[0] as any; // Super admin da Aurovel
-        }
+        authResult = await userService.authenticateByCompany(loginData.company || '', loginData.password);
       }
 
-      if (!user) {
+      if (!authResult) {
         setError('Credenciais inválidas');
         toast.error('Falha no login', {
           description: 'Email, senha ou empresa incorretos'
@@ -190,17 +69,13 @@ export const LoginComponent: React.FC<LoginComponentProps> = ({ onLogin, classNa
         return;
       }
 
-      const company = COMPANIES[user.companyId];
-      
-      // Remove password from user data
-      const { password, ...userDataClean } = user as any;
-      const userData = userDataClean as User;
+      const { user: userData, company: companyData } = authResult;
 
       toast.success('Login realizado com sucesso!', {
         description: `Bem-vindo, ${userData.name}`
       });
 
-      onLogin(userData, company);
+      onLogin(userData, companyData);
 
     } catch (err) {
       setError('Erro interno do servidor');
@@ -216,7 +91,9 @@ export const LoginComponent: React.FC<LoginComponentProps> = ({ onLogin, classNa
       'aurovel-manager': { email: 'manager@aurovel.com', password: 'manager123' },
       'tech-admin': { email: 'admin@techsolutions.com', password: 'tech123' },
       'tech-user': { email: 'user@techsolutions.com', password: 'user123' },
-      'inov-admin': { email: 'admin@inovacaodigital.com', password: 'inov123' }
+      'inov-admin': { email: 'admin@inovacaodigital.com', password: 'inov123' },
+      'vendas-tech': { email: 'vendas@techsolutions.com', password: 'vendas123' },
+      'viewer-inov': { email: 'viewer@inovacaodigital.com', password: 'viewer123' }
     };
 
     const cred = credentials[userType];
@@ -415,17 +292,42 @@ export const LoginComponent: React.FC<LoginComponentProps> = ({ onLogin, classNa
 
             <div className="space-y-2">
               <div className="flex items-center gap-2">
-                <Badge variant="secondary">Inovação Digital</Badge>
-                <span className="text-xs text-muted-foreground">Cliente</span>
+                <Badge variant="secondary">Vendas Tech</Badge>
+                <span className="text-xs text-muted-foreground">Usuário</span>
               </div>
               <Button 
                 variant="outline" 
                 size="sm" 
-                onClick={() => fillDemoCredentials('inov-admin')}
+                onClick={() => fillDemoCredentials('vendas-tech')}
                 className="text-xs w-full"
               >
-                Admin
+                Equipe Vendas
               </Button>
+            </div>
+
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <Badge variant="secondary">Inovação Digital</Badge>
+                <span className="text-xs text-muted-foreground">Cliente</span>
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={() => fillDemoCredentials('inov-admin')}
+                  className="text-xs"
+                >
+                  Admin
+                </Button>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={() => fillDemoCredentials('viewer-inov')}
+                  className="text-xs"
+                >
+                  Viewer
+                </Button>
+              </div>
             </div>
 
             <Alert className="mt-4">
