@@ -373,6 +373,22 @@ export const UserProfile: React.FC<UserProfileProps> = ({ className = "" }) => {
           </Dialog>
         </div>
 
+        {/* Logout Section */}
+        <div className="bg-red-50 p-4 rounded-lg border border-red-200">
+          <h4 className="font-semibold mb-2 flex items-center gap-2 text-red-800">
+            <Shield className="h-4 w-4" />
+            Sair do Sistema
+          </h4>
+          <p className="text-sm text-red-600 mb-3">
+            Encerrar sua sessão e sair do sistema com segurança.
+          </p>
+          <LogoutButton 
+            variant="destructive" 
+            size="sm" 
+            className="w-full"
+          />
+        </div>
+
         {/* Security Info */}
         <div className="bg-blue-50 p-4 rounded-lg">
           <h4 className="font-semibold mb-2 flex items-center gap-2 text-blue-800">

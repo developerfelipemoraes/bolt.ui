@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ArrowLeft, Users, Building2, Settings, Crown, Shield } from 'lucide-react';
 import { useAuth } from '@/components/auth';
+import { LogoutButton } from '@/components/auth';
 import { PermissionGuard } from '@/components/ui/permission-guard';
 import { UserManagement } from '@/components/admin/UserManagement';
 import { UserProfile } from '@/components/auth/UserProfile';
@@ -250,6 +251,12 @@ export default function AdminPanel() {
                     </div>
                   </CardContent>
                 </Card>
+                <LogoutButton 
+                  variant="ghost" 
+                  size="sm" 
+                  showText={false}
+                  className="text-red-600 hover:text-red-600 hover:bg-red-50"
+                />
               </div>
             } 
           />

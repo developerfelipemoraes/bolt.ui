@@ -290,20 +290,6 @@ export const LoginComponent: React.FC<LoginComponentProps> = ({ onLogin, classNa
               </div>
             </div>
 
-            <div className="space-y-2">
-              <div className="flex items-center gap-2">
-                <Badge variant="secondary">Vendas Tech</Badge>
-                <span className="text-xs text-muted-foreground">Usuário</span>
-              </div>
-              <Button 
-                variant="outline" 
-                size="sm" 
-                onClick={() => fillDemoCredentials('vendas-tech')}
-                className="text-xs w-full"
-              >
-                Equipe Vendas
-              </Button>
-            </div>
 
             <div className="space-y-2">
               <div className="flex items-center gap-2">

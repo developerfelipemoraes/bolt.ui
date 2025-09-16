@@ -37,6 +37,7 @@ import {
   Activity
 } from 'lucide-react';
 import { UserMenu, useAuth } from '@/components/auth';
+import { LogoutButton } from '@/components/auth';
 import { CompanySelector } from '@/components/admin/CompanySelector';
 import { PermissionGuard } from '@/components/ui/permission-guard';
 
@@ -268,6 +269,15 @@ export default function MainLayout() {
               <SidebarMenuItem>
                 <UserMenu />
               </SidebarMenuItem>
+              <SidebarMenuItem>
+                <div className="px-2 py-1">
+                  <LogoutButton 
+                    variant="outline" 
+                    size="sm" 
+                    className="w-full justify-start text-red-600 hover:text-red-600 hover:bg-red-50"
+                  />
+                </div>
+              </SidebarMenuItem>
             </SidebarMenu>
           </SidebarFooter>
         </Sidebar>
@@ -281,6 +291,12 @@ export default function MainLayout() {
                 <Badge variant="secondary" className="text-xs">3</Badge>
               </div>
               <div className="ml-auto flex items-center gap-2">
+                <LogoutButton 
+                  variant="ghost" 
+                  size="sm" 
+                  showText={false}
+                  className="text-red-600 hover:text-red-600 hover:bg-red-50"
+                />
                 <Button variant="ghost" size="sm">
                   <Settings className="h-4 w-4" />
                 </Button>

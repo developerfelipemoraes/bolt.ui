@@ -25,6 +25,7 @@ import {
   RefreshCw,
   Activity
 } from 'lucide-react';
+import { LogOut } from 'lucide-react';
 import { useAuth } from '@/components/auth';
 import { User, UserRole, Company } from '@/types/auth';
 import { userService } from '@/services/userService';
@@ -253,6 +254,22 @@ export const UserCRUD: React.FC<UserCRUDProps> = ({ className = "" }) => {
     }
   };
 
+  const handleForceLogout = async (user: User) => {
+    if (!currentUser) return;
+
+    try {
+      await userService.invalidateAllUserSessions(user.id);
+      
+      await userService.logUserAction(currentUser.id, 'force_logout', {
+        targetUserId: user.id,
+        targetUserEmail: user.email
+      });
+
+      toast.success(`Logout forçado para ${user.name}`);
+    } catch (error: any) {
+      toast.error(error.message || 'Erro ao forçar logout');
+    }
+  };
   const openEditDialog = (user: User) => {
     setSelectedUser(user);
     setEditForm({
@@ -493,6 +510,17 @@ export const UserCRUD: React.FC<UserCRUDProps> = ({ className = "" }) => {
                             className="text-red-600 hover:text-red-800"
                           >
                             <Trash2 className="h-4 w-4" />
+                          </Button>
+                          
+                          {/* Force Logout Button */}
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleForceLogout(user)}
+                            className="text-orange-600 hover:text-orange-800"
+                            title="Forçar logout do usuário"
+                          >
+                            <LogOut className="h-4 w-4" />
                           </Button>
                         </div>
                       )}

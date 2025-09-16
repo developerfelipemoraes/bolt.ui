@@ -23,6 +23,7 @@ import {
   AlertTriangle
 } from 'lucide-react';
 import { useAuth } from '@/components/auth';
+import { LogoutButton } from '@/components/auth';
 import { useNavigate } from 'react-router-dom';
 
 export default function CRMDashboard() {
@@ -554,6 +555,12 @@ export default function CRMDashboard() {
                 Ver Relatório
               </Button>
             </div>
+            <LogoutButton 
+              variant="outline" 
+              size="sm" 
+              showText={false}
+              className="text-red-600 hover:text-red-600 hover:bg-red-50"
+            />
           </div>
         </CardContent>
       </Card>

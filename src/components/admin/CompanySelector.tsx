@@ -12,6 +12,7 @@ import {
   Check
 } from 'lucide-react';
 import { useAuth } from '@/components/auth';
+import { LogoutButton } from '@/components/auth';
 import { Company } from '@/types/auth';
 import { toast } from 'sonner';
 
@@ -187,6 +188,15 @@ export const CompanySelector: React.FC<CompanySelectorProps> = ({ className = ""
             <p className="text-xs text-purple-600 mt-1">Trocando empresa...</p>
           </div>
         )}
+
+        {/* Quick Logout for Super Admin */}
+        <div className="pt-3 border-t border-purple-200">
+          <LogoutButton 
+            variant="outline" 
+            size="sm" 
+            className="w-full text-red-600 hover:text-red-600 hover:bg-red-50 border-red-200"
+          />
+        </div>
       </CardContent>
     </Card>
   );
