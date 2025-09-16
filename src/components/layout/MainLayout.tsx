@@ -37,9 +37,11 @@ import {
   Activity
 } from 'lucide-react';
 import { UserMenu, useAuth } from '@/components/auth';
+import { CompanySelector } from '@/components/admin/CompanySelector';
+import { PermissionGuard } from '@/components/ui/permission-guard';
 
 export default function MainLayout() {
-  const { user, isAurovel } = useAuth();
+  const { user, company, isAurovel, isSuperAdmin, hasPermission } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [searchTerm, setSearchTerm] = useState('');
@@ -49,25 +51,33 @@ export default function MainLayout() {
       path: '/dashboard', 
       label: 'Dashboard', 
       icon: BarChart3,
-      description: 'Visão geral e métricas'
+      description: 'Visão geral e métricas',
+      resource: 'reports',
+      action: 'read' as const
     },
     { 
       path: '/contacts', 
       label: 'Contatos (PF)', 
       icon: Users,
-      description: 'Gestão de pessoas físicas'
+      description: 'Gestão de pessoas físicas',
+      resource: 'contacts',
+      action: 'read' as const
     },
     { 
       path: '/companies', 
       label: 'Empresas (PJ)', 
       icon: Building2,
-      description: 'Gestão de pessoas jurídicas'
+      description: 'Gestão de pessoas jurídicas',
+      resource: 'companies',
+      action: 'read' as const
     },
     { 
       path: '/vehicles', 
       label: 'Veículos', 
       icon: Car,
-      description: 'Estoque e produtos'
+      description: 'Estoque e produtos',
+      resource: 'vehicles',
+      action: 'read' as const
     },
   ];
 
@@ -76,25 +86,33 @@ export default function MainLayout() {
       path: '/sales', 
       label: 'Vendas & Pipeline', 
       icon: DollarSign,
-      description: 'Funil de vendas e oportunidades'
+      description: 'Funil de vendas e oportunidades',
+      resource: 'sales',
+      action: 'read' as const
     },
     { 
       path: '/matching', 
       label: 'Smart Matching', 
       icon: Search,
-      description: 'Correspondência inteligente'
+      description: 'Correspondência inteligente',
+      resource: 'contacts',
+      action: 'read' as const
     },
     { 
       path: '/tasks', 
       label: 'Tarefas & Atividades', 
       icon: Calendar,
-      description: 'Agenda e follow-ups'
+      description: 'Agenda e follow-ups',
+      resource: 'sales',
+      action: 'read' as const
     },
     { 
       path: '/reports', 
       label: 'Relatórios', 
       icon: FileText,
-      description: 'Analytics e insights'
+      description: 'Analytics e insights',
+      resource: 'reports',
+      action: 'read' as const
     },
   ];
 
@@ -116,7 +134,7 @@ export default function MainLayout() {
                   {isAurovel ? 'CRM Master' : 'Sistema CRM'}
                 </h2>
                 <p className="text-xs text-gray-600 truncate">
-                  {user?.companyData.name}
+                  {company?.name}
                 </p>
               </div>
             </div>
@@ -132,6 +150,17 @@ export default function MainLayout() {
           </SidebarHeader>
 
           <SidebarContent>
+            {/* Company Selector for Super Admin */}
+            {isSuperAdmin && (
+              <SidebarGroup>
+                <SidebarGroupContent>
+                  <div className="px-2">
+                    <CompanySelector />
+                  </div>
+                </SidebarGroupContent>
+              </SidebarGroup>
+            )}
+
             {/* Search */}
             <SidebarGroup>
               <SidebarGroupContent>
@@ -153,6 +182,10 @@ export default function MainLayout() {
                 <SidebarMenu>
                   {mainMenuItems.map((item) => {
                     const Icon = item.icon;
+                    const hasAccess = hasPermission(item.resource, item.action);
+                    
+                    if (!hasAccess) return null;
+                    
                     return (
                       <SidebarMenuItem key={item.path}>
                         <SidebarMenuButton
@@ -177,6 +210,10 @@ export default function MainLayout() {
                 <SidebarMenu>
                   {crmMenuItems.map((item) => {
                     const Icon = item.icon;
+                    const hasAccess = hasPermission(item.resource, item.action);
+                    
+                    if (!hasAccess) return null;
+                    
                     return (
                       <SidebarMenuItem key={item.path}>
                         <SidebarMenuButton
@@ -199,18 +236,24 @@ export default function MainLayout() {
               <SidebarGroupLabel>Estatísticas Rápidas</SidebarGroupLabel>
               <SidebarGroupContent>
                 <div className="px-4 space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Contatos</span>
-                    <span className="font-medium">156</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Empresas</span>
-                    <span className="font-medium">43</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Veículos</span>
-                    <span className="font-medium">89</span>
-                  </div>
+                  {hasPermission('contacts', 'read') && (
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">Contatos</span>
+                      <span className="font-medium">156</span>
+                    </div>
+                  )}
+                  {hasPermission('companies', 'read') && (
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">Empresas</span>
+                      <span className="font-medium">43</span>
+                    </div>
+                  )}
+                  {hasPermission('vehicles', 'read') && (
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">Veículos</span>
+                      <span className="font-medium">89</span>
+                    </div>
+                  )}
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">Matches</span>
                     <span className="font-medium text-green-600">67</span>

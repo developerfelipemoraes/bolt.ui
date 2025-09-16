@@ -6,6 +6,8 @@ import { Input } from '@/components/ui/input';
 import { Users, Plus, Search, Edit, Eye, Trash2, Mail, Phone, MapPin, Briefcase, ArrowLeft } from 'lucide-react';
 import { apiService } from '@/services/api';
 import { toast } from 'sonner';
+import { useAuth } from '@/components/auth';
+import { PermissionGuard } from '@/components/ui/permission-guard';
 
 interface Contact {
   _id: string;
@@ -56,6 +58,7 @@ export default function ContactListReal({ onBack, onEdit, onView, onNew }: Conta
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
+  const { hasPermission } = useAuth();
 
   useEffect(() => {
     loadContacts();
@@ -150,6 +153,11 @@ export default function ContactListReal({ onBack, onEdit, onView, onNew }: Conta
 
   // Função para remover contato
   const handleDelete = async (contactId: string) => {
+    if (!hasPermission('contacts', 'delete')) {
+      toast.error('Você não tem permissão para excluir contatos');
+      return;
+    }
+    
     if (!confirm('Tem certeza que deseja excluir este contato?')) {
       return;
     }
@@ -198,10 +206,12 @@ export default function ContactListReal({ onBack, onEdit, onView, onNew }: Conta
               </p>
             </div>
           </div>
-          <Button onClick={onNew} className="bg-green-600 hover:bg-green-700">
-            <Plus className="w-4 h-4 mr-2" />
-            Novo Contato
-          </Button>
+          <PermissionGuard resource="contacts" action="create" showFallback={false}>
+            <Button onClick={onNew} className="bg-green-600 hover:bg-green-700">
+              <Plus className="w-4 h-4 mr-2" />
+              Novo Contato
+            </Button>
+          </PermissionGuard>
         </div>
 
         {/* Search */}
@@ -273,10 +283,12 @@ export default function ContactListReal({ onBack, onEdit, onView, onNew }: Conta
                 }
               </p>
               {!searchTerm && (
-                <Button onClick={onNew} className="bg-green-600 hover:bg-green-700">
-                  <Plus className="w-4 h-4 mr-2" />
-                  Criar Primeiro Contato
-                </Button>
+                <PermissionGuard resource="contacts" action="create" showFallback={false}>
+                  <Button onClick={onNew} className="bg-green-600 hover:bg-green-700">
+                    <Plus className="w-4 h-4 mr-2" />
+                    Criar Primeiro Contato
+                  </Button>
+                </PermissionGuard>
               )}
             </CardContent>
           </Card>
@@ -359,22 +371,26 @@ export default function ContactListReal({ onBack, onEdit, onView, onNew }: Conta
                       >
                         <Eye className="w-4 h-4" />
                       </Button>
-                      <Button 
-                        size="sm" 
-                        variant="outline"
-                        className="flex-1"
-                        onClick={() => onEdit(contact)}
-                      >
-                        <Edit className="w-4 h-4" />
-                      </Button>
-                      <Button 
-                        size="sm" 
-                        variant="outline"
-                        onClick={() => handleDelete(contact._id)}
-                        className="text-red-600 hover:text-red-700 hover:border-red-300"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
+                      <PermissionGuard resource="contacts" action="update" showFallback={false}>
+                        <Button 
+                          size="sm" 
+                          variant="outline"
+                          className="flex-1"
+                          onClick={() => onEdit(contact)}
+                        >
+                          <Edit className="w-4 h-4" />
+                        </Button>
+                      </PermissionGuard>
+                      <PermissionGuard resource="contacts" action="delete" showFallback={false}>
+                        <Button 
+                          size="sm" 
+                          variant="outline"
+                          onClick={() => handleDelete(contact._id)}
+                          className="text-red-600 hover:text-red-700 hover:border-red-300"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </PermissionGuard>
                     </div>
                   </CardContent>
                 </Card>

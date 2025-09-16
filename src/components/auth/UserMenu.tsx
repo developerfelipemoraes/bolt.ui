@@ -16,39 +16,47 @@ import {
   Crown, 
   Building2, 
   Shield,
-  Users
+  Users,
+  ChevronDown
 } from 'lucide-react';
 import { useAuth } from './AuthContext';
 import { toast } from 'sonner';
+import { UserRole } from '@/types/auth';
 
 interface UserMenuProps {
   className?: string;
 }
 
 export const UserMenu: React.FC<UserMenuProps> = ({ className = "" }) => {
-  const { user, logout, isAurovel } = useAuth();
+  const { user, company, logout, isAurovel, isSuperAdmin, isCompanyAdmin, switchCompany } = useAuth();
 
-  if (!user) return null;
+  if (!user || !company) return null;
 
   const handleLogout = () => {
     logout();
     toast.success('Logout realizado com sucesso');
   };
 
+  const handleCompanySwitch = async (companyId: string) => {
+    try {
+      await switchCompany(companyId);
+    } catch (error) {
+      toast.error('Erro ao trocar empresa');
+    }
+  };
+
   const getRoleDisplay = (role: string) => {
     const roles = {
-      'super_admin': 'Super Admin',
-      'admin': 'Administrador',
-      'company_admin': 'Admin da Empresa',
-      'user': 'Usuário'
+      [UserRole.SUPER_ADMIN]: 'Super Admin',
+      [UserRole.COMPANY_ADMIN]: 'Admin da Empresa',
+      [UserRole.USER]: 'Usuário'
     };
-    return roles[role as keyof typeof roles] || role;
+    return roles[role as UserRole] || role;
   };
 
   const getRoleBadgeVariant = (role: string) => {
-    if (role === 'super_admin') return 'default';
-    if (role === 'admin') return 'secondary';
-    if (role === 'company_admin') return 'outline';
+    if (role === UserRole.SUPER_ADMIN) return 'default';
+    if (role === UserRole.COMPANY_ADMIN) return 'outline';
     return 'secondary';
   };
 
@@ -71,7 +79,7 @@ export const UserMenu: React.FC<UserMenuProps> = ({ className = "" }) => {
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-2">
             <div className="flex items-center gap-2">
-              <div className="text-lg">{user.companyData.logo}</div>
+              <div className="text-lg">{company.logo}</div>
               <div>
                 <p className="text-sm font-medium leading-none">{user.name}</p>
                 <p className="text-xs leading-none text-muted-foreground mt-1">
@@ -85,10 +93,9 @@ export const UserMenu: React.FC<UserMenuProps> = ({ className = "" }) => {
                 variant={getRoleBadgeVariant(user.role)}
                 className="text-xs"
               >
-                {isAurovel && user.role === 'super_admin' && <Crown className="h-3 w-3 mr-1" />}
-                {user.role === 'admin' && <Shield className="h-3 w-3 mr-1" />}
-                {user.role === 'company_admin' && <Building2 className="h-3 w-3 mr-1" />}
-                {user.role === 'user' && <Users className="h-3 w-3 mr-1" />}
+                {isSuperAdmin && <Crown className="h-3 w-3 mr-1" />}
+                {isCompanyAdmin && <Building2 className="h-3 w-3 mr-1" />}
+                {user.role === UserRole.USER && <Users className="h-3 w-3 mr-1" />}
                 {getRoleDisplay(user.role)}
               </Badge>
             </div>
@@ -97,10 +104,10 @@ export const UserMenu: React.FC<UserMenuProps> = ({ className = "" }) => {
               <div className="flex items-center gap-2">
                 <Building2 className="h-3 w-3 text-muted-foreground" />
                 <span className="text-xs text-muted-foreground">
-                  {user.companyData.name}
+                  {company.name}
                 </span>
               </div>
-              {isAurovel && (
+              {isSuperAdmin && (
                 <div className="flex items-center gap-2">
                   <Crown className="h-3 w-3 text-purple-600" />
                   <span className="text-xs text-purple-600 font-medium">
@@ -114,19 +121,39 @@ export const UserMenu: React.FC<UserMenuProps> = ({ className = "" }) => {
         
         <DropdownMenuSeparator />
         
+        {/* Company Switcher for Super Admin */}
+        {isSuperAdmin && (
+          <>
+            <div className="p-2">
+              <div className="text-xs text-muted-foreground mb-2">Empresa Ativa:</div>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="text-lg">{company.logo}</span>
+                  <span className="text-sm font-medium">{company.name}</span>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => handleCompanySwitch(company.id === 'aurovel' ? 'tech-solutions' : 'aurovel')}
+                >
+                  <ChevronDown className="h-3 w-3" />
+                </Button>
+              </div>
+            </div>
+            <DropdownMenuSeparator />
+          </>
+        )}
+
+        {/* Permissions Display */}
         <div className="p-2">
-          <div className="text-xs text-muted-foreground mb-2">Permissões:</div>
+          <div className="text-xs text-muted-foreground mb-2">Nível de Acesso:</div>
           <div className="flex flex-wrap gap-1">
-            {user.permissions.slice(0, 3).map((permission) => (
-              <Badge key={permission} variant="outline" className="text-xs">
-                {permission === 'all' ? 'Todas' : permission}
-              </Badge>
-            ))}
-            {user.permissions.length > 3 && (
-              <Badge variant="outline" className="text-xs">
-                +{user.permissions.length - 3} mais
-              </Badge>
-            )}
+            <Badge variant="outline" className="text-xs">
+              {getRoleDisplay(user.role)}
+            </Badge>
+            <Badge variant="outline" className="text-xs">
+              {company.type === 'master' ? 'Todas Empresas' : 'Empresa Própria'}
+            </Badge>
           </div>
         </div>
 
@@ -136,6 +163,13 @@ export const UserMenu: React.FC<UserMenuProps> = ({ className = "" }) => {
           <Settings className="mr-2 h-4 w-4" />
           <span>Configurações</span>
         </DropdownMenuItem>
+        
+        {isCompanyAdmin && (
+          <DropdownMenuItem className="cursor-pointer">
+            <Users className="mr-2 h-4 w-4" />
+            <span>Gerenciar Usuários</span>
+          </DropdownMenuItem>
+        )}
         
         <DropdownMenuSeparator />
         

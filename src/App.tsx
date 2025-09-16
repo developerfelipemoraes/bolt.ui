@@ -14,6 +14,7 @@ import SalesManagement from './pages/SalesManagement';
 import ReportsAnalytics from './pages/ReportsAnalytics';
 import TasksActivities from './pages/TasksActivities';
 import NotFound from './pages/NotFound';
+import AdminPanel from './pages/AdminPanel';
 
 const queryClient = new QueryClient();
 
@@ -41,6 +42,7 @@ const App = () => (
               <Route path="sales/*" element={<SalesManagement />} />
               <Route path="reports/*" element={<ReportsAnalytics />} />
               <Route path="tasks/*" element={<TasksActivities />} />
+              <Route path="admin/*" element={<AdminPanel />} />
             </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>

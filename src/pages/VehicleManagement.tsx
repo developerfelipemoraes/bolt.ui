@@ -6,6 +6,7 @@ import { VehicleWizard } from '@/components/VehicleWizard';
 import { VehicleList } from '@/components/VehicleList';
 import { VehicleSummary } from '@/components/VehicleSummary';
 import { Vehicle } from '@/types/vehicle';
+import { PermissionGuard } from '@/components/ui/permission-guard';
 
 export default function VehicleManagement() {
   const navigate = useNavigate();
@@ -39,31 +40,35 @@ export default function VehicleManagement() {
       <Route 
         path="/" 
         element={
-          <VehicleList
-            onAdd={handleNewVehicle}
-            onEdit={handleEditVehicle}
-          />
+          <PermissionGuard resource="vehicles" action="read">
+            <VehicleList
+              onAdd={handleNewVehicle}
+              onEdit={handleEditVehicle}
+            />
+          </PermissionGuard>
         } 
       />
       <Route 
         path="/new" 
         element={
-          <div className="min-h-screen bg-gradient-to-br from-purple-50 to-indigo-50">
-            <div className="max-w-6xl mx-auto p-6">
-              <Button 
-                variant="outline" 
-                onClick={() => navigate('/vehicles')}
-                className="mb-6"
-              >
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Voltar à Lista
-              </Button>
-              <VehicleWizard
-                onComplete={handleVehicleComplete}
-                onCancel={handleVehicleCancel}
-              />
+          <PermissionGuard resource="vehicles" action="create">
+            <div className="min-h-screen bg-gradient-to-br from-purple-50 to-indigo-50">
+              <div className="max-w-6xl mx-auto p-6">
+                <Button 
+                  variant="outline" 
+                  onClick={() => navigate('/vehicles')}
+                  className="mb-6"
+                >
+                  <ArrowLeft className="w-4 h-4 mr-2" />
+                  Voltar à Lista
+                </Button>
+                <VehicleWizard
+                  onComplete={handleVehicleComplete}
+                  onCancel={handleVehicleCancel}
+                />
+              </div>
             </div>
-          </div>
+          </PermissionGuard>
         } 
       />
       <Route 

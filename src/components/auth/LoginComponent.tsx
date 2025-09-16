@@ -17,6 +17,7 @@ import {
   Crown
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { User, Company, UserRole } from '@/types/auth';
 
 interface LoginData {
   email: string;
@@ -25,54 +26,86 @@ interface LoginData {
 }
 
 interface LoginComponentProps {
-  onLogin: (userData: any) => void;
+  onLogin: (userData: User, companyData: Company) => void;
   className?: string;
 }
-
 // Dados mockados das empresas e usuários
-const COMPANIES = {
+const COMPANIES: Record<string, Company> = {
   'aurovel': {
     id: 'aurovel',
     name: 'Aurovel',
     type: 'master',
     logo: '👑',
-    description: 'Controle Total do Sistema'
+    description: 'Controle Total do Sistema',
+    settings: {
+      maxUsers: 1000,
+      allowedModules: ['all'],
+      customBranding: true,
+      dataRetentionDays: 365
+    },
+    isActive: true,
+    createdAt: '2024-01-01',
+    updatedAt: '2024-01-01'
   },
   'tech-solutions': {
     id: 'tech-solutions', 
     name: 'Tech Solutions Ltda',
     type: 'client',
     logo: '🏢',
-    description: 'Empresa Cliente'
+    description: 'Empresa Cliente',
+    settings: {
+      maxUsers: 50,
+      allowedModules: ['contacts', 'companies', 'vehicles'],
+      customBranding: false,
+      dataRetentionDays: 90
+    },
+    isActive: true,
+    createdAt: '2024-01-01',
+    updatedAt: '2024-01-01'
   },
   'inovacao-digital': {
     id: 'inovacao-digital',
     name: 'Inovação Digital S.A.',
     type: 'client', 
     logo: '💡',
-    description: 'Empresa Cliente'
+    description: 'Empresa Cliente',
+    settings: {
+      maxUsers: 25,
+      allowedModules: ['contacts', 'companies'],
+      customBranding: false,
+      dataRetentionDays: 60
+    },
+    isActive: true,
+    createdAt: '2024-01-01',
+    updatedAt: '2024-01-01'
   }
 };
 
-const USERS = [
+const USERS: User[] = [
   // Usuários Aurovel (controle total)
   {
     id: '1',
     email: 'admin@aurovel.com',
     password: 'admin123',
     name: 'Administrador Aurovel',
-    company: 'aurovel',
-    role: 'super_admin',
-    permissions: ['all']
+    companyId: 'aurovel',
+    role: UserRole.SUPER_ADMIN,
+    permissions: [],
+    isActive: true,
+    createdAt: '2024-01-01',
+    updatedAt: '2024-01-01'
   },
   {
     id: '2', 
     email: 'manager@aurovel.com',
     password: 'manager123',
     name: 'Gerente Aurovel',
-    company: 'aurovel',
-    role: 'admin',
-    permissions: ['read', 'write', 'delete', 'manage_companies']
+    companyId: 'aurovel',
+    role: UserRole.SUPER_ADMIN,
+    permissions: [],
+    isActive: true,
+    createdAt: '2024-01-01',
+    updatedAt: '2024-01-01'
   },
   // Usuários Tech Solutions
   {
@@ -80,18 +113,24 @@ const USERS = [
     email: 'admin@techsolutions.com',
     password: 'tech123',
     name: 'Admin Tech Solutions',
-    company: 'tech-solutions',
-    role: 'company_admin',
-    permissions: ['read', 'write', 'delete_own']
+    companyId: 'tech-solutions',
+    role: UserRole.COMPANY_ADMIN,
+    permissions: [],
+    isActive: true,
+    createdAt: '2024-01-01',
+    updatedAt: '2024-01-01'
   },
   {
     id: '4',
     email: 'user@techsolutions.com', 
     password: 'user123',
     name: 'Usuário Tech Solutions',
-    company: 'tech-solutions',
-    role: 'user',
-    permissions: ['read', 'write_own']
+    companyId: 'tech-solutions',
+    role: UserRole.USER,
+    permissions: [],
+    isActive: true,
+    createdAt: '2024-01-01',
+    updatedAt: '2024-01-01'
   },
   // Usuários Inovação Digital
   {
@@ -99,9 +138,12 @@ const USERS = [
     email: 'admin@inovacaodigital.com',
     password: 'inov123',
     name: 'Admin Inovação Digital',
-    company: 'inovacao-digital',
-    role: 'company_admin',
-    permissions: ['read', 'write', 'delete_own']
+    companyId: 'inovacao-digital',
+    role: UserRole.COMPANY_ADMIN,
+    permissions: [],
+    isActive: true,
+    createdAt: '2024-01-01',
+    updatedAt: '2024-01-01'
   }
 ];
 
@@ -129,14 +171,14 @@ export const LoginComponent: React.FC<LoginComponentProps> = ({ onLogin, classNa
 
       if (loginType === 'email') {
         // Login por email/senha
-        user = USERS.find(u => 
+        user = USERS.find((u: any) => 
           u.email === loginData.email && 
           u.password === loginData.password
         );
       } else {
         // Login por empresa (apenas Aurovel)
         if (loginData.company === 'aurovel' && loginData.password === 'aurovel2024') {
-          user = USERS[0]; // Super admin da Aurovel
+          user = USERS[0] as any; // Super admin da Aurovel
         }
       }
 
@@ -148,22 +190,17 @@ export const LoginComponent: React.FC<LoginComponentProps> = ({ onLogin, classNa
         return;
       }
 
-      const company = COMPANIES[user.company as keyof typeof COMPANIES];
+      const company = COMPANIES[user.companyId];
       
-      const userData = {
-        ...user,
-        companyData: company,
-        loginTime: new Date().toISOString()
-      };
+      // Remove password from user data
+      const { password, ...userDataClean } = user as any;
+      const userData = userDataClean as User;
 
-      // Salvar no localStorage
-      localStorage.setItem('user', JSON.stringify(userData));
-      
       toast.success('Login realizado com sucesso!', {
-        description: `Bem-vindo, ${user.name}`
+        description: `Bem-vindo, ${userData.name}`
       });
 
-      onLogin(userData);
+      onLogin(userData, company);
 
     } catch (err) {
       setError('Erro interno do servidor');

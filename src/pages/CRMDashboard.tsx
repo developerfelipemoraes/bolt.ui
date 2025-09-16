@@ -26,7 +26,7 @@ import { useAuth } from '@/components/auth';
 import { useNavigate } from 'react-router-dom';
 
 export default function CRMDashboard() {
-  const { user, isAurovel } = useAuth();
+  const { user, company, isAurovel, hasPermission } = useAuth();
   const navigate = useNavigate();
 
   // Mock data - em produção viria da API
@@ -147,7 +147,7 @@ export default function CRMDashboard() {
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Dashboard CRM</h1>
           <p className="text-gray-600">
-            Bem-vindo, {user?.name} • {user?.companyData.name}
+            Bem-vindo, {user?.name} • {company?.name}
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -161,59 +161,67 @@ export default function CRMDashboard() {
 
       {/* KPIs Principais */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate('/contacts')}>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Contatos (PF)</CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-blue-600">{dashboardData.kpis.totalContacts}</div>
-            <p className="text-xs text-muted-foreground">
-              +12 este mês
-            </p>
-          </CardContent>
-        </Card>
+        {hasPermission('contacts', 'read') && (
+          <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate('/contacts')}>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Contatos (PF)</CardTitle>
+              <Users className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-blue-600">{dashboardData.kpis.totalContacts}</div>
+              <p className="text-xs text-muted-foreground">
+                +12 este mês
+              </p>
+            </CardContent>
+          </Card>
+        )}
 
-        <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate('/companies')}>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Empresas (PJ)</CardTitle>
-            <Building2 className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-green-600">{dashboardData.kpis.totalCompanies}</div>
-            <p className="text-xs text-muted-foreground">
-              +8 este mês
-            </p>
-          </CardContent>
-        </Card>
+        {hasPermission('companies', 'read') && (
+          <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate('/companies')}>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Empresas (PJ)</CardTitle>
+              <Building2 className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-green-600">{dashboardData.kpis.totalCompanies}</div>
+              <p className="text-xs text-muted-foreground">
+                +8 este mês
+              </p>
+            </CardContent>
+          </Card>
+        )}
 
-        <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate('/vehicles')}>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Veículos</CardTitle>
-            <Car className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-purple-600">{dashboardData.kpis.totalVehicles}</div>
-            <p className="text-xs text-muted-foreground">
-              +15 este mês
-            </p>
-          </CardContent>
-        </Card>
+        {hasPermission('vehicles', 'read') && (
+          <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate('/vehicles')}>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Veículos</CardTitle>
+              <Car className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-purple-600">{dashboardData.kpis.totalVehicles}</div>
+              <p className="text-xs text-muted-foreground">
+                +15 este mês
+              </p>
+            </CardContent>
+          </Card>
+        )}
 
-        <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate('/sales')}>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Receita</CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-orange-600">
-              {formatCurrency(dashboardData.kpis.totalRevenue)}
-            </div>
-            <p className="text-xs text-muted-foreground">
-              +{dashboardData.kpis.monthlyGrowth}% este mês
-            </p>
-          </CardContent>
-        </Card>
+        {hasPermission('sales', 'read') && (
+          <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate('/sales')}>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Receita</CardTitle>
+              <DollarSign className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-orange-600">
+                {formatCurrency(dashboardData.kpis.totalRevenue)}
+              </div>
+              <p className="text-xs text-muted-foreground">
+                +{dashboardData.kpis.monthlyGrowth}% este mês
+              </p>
+            </CardContent>
+          </Card>
+        )}
       </div>
 
       {/* Conteúdo Principal */}
@@ -339,6 +347,7 @@ export default function CRMDashboard() {
             <Button 
               className="w-full justify-start h-12"
               onClick={() => navigate('/contacts/new')}
+              disabled={!hasPermission('contacts', 'create')}
             >
               <Users className="h-4 w-4 mr-3" />
               <div className="text-left">
@@ -351,6 +360,7 @@ export default function CRMDashboard() {
               variant="outline" 
               className="w-full justify-start h-12"
               onClick={() => navigate('/companies/new')}
+              disabled={!hasPermission('companies', 'create')}
             >
               <Building2 className="h-4 w-4 mr-3" />
               <div className="text-left">
@@ -363,6 +373,7 @@ export default function CRMDashboard() {
               variant="outline" 
               className="w-full justify-start h-12"
               onClick={() => navigate('/vehicles/new')}
+              disabled={!hasPermission('vehicles', 'create')}
             >
               <Car className="h-4 w-4 mr-3" />
               <div className="text-left">
@@ -375,6 +386,7 @@ export default function CRMDashboard() {
               variant="outline" 
               className="w-full justify-start h-12"
               onClick={() => navigate('/matching')}
+              disabled={!hasPermission('contacts', 'read')}
             >
               <Target className="h-4 w-4 mr-3" />
               <div className="text-left">

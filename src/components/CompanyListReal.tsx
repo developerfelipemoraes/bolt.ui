@@ -7,6 +7,8 @@ import { ArrowLeft, Search, Building, Edit, Eye, Plus, MapPin, Phone, Mail } fro
 import { toast } from 'sonner';
 import { apiService } from '@/services/api';
 import { CompanyData } from '@/types/company';
+import { useAuth } from '@/components/auth';
+import { PermissionGuard } from '@/components/ui/permission-guard';
 
 interface CompanyListProps {
   onBack: () => void;
@@ -19,6 +21,7 @@ export default function CompanyListReal({ onBack, onEdit, onView, onNew }: Compa
   const [companies, setCompanies] = useState<CompanyData[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  const { hasPermission } = useAuth();
 
   useEffect(() => {
     loadCompanies();
@@ -84,10 +87,12 @@ export default function CompanyListReal({ onBack, onEdit, onView, onNew }: Compa
               </p>
             </div>
           </div>
-          <Button onClick={onNew} className="bg-blue-600 hover:bg-blue-700">
-            <Plus className="w-4 h-4 mr-2" />
-            Nova Empresa
-          </Button>
+          <PermissionGuard resource="companies" action="create" showFallback={false}>
+            <Button onClick={onNew} className="bg-blue-600 hover:bg-blue-700">
+              <Plus className="w-4 h-4 mr-2" />
+              Nova Empresa
+            </Button>
+          </PermissionGuard>
         </div>
 
         {/* Search */}
@@ -118,10 +123,12 @@ export default function CompanyListReal({ onBack, onEdit, onView, onNew }: Compa
                 }
               </p>
               {!searchTerm && (
-                <Button onClick={onNew} className="bg-blue-600 hover:bg-blue-700">
-                  <Plus className="w-4 h-4 mr-2" />
-                  Criar Primeira Empresa
-                </Button>
+                <PermissionGuard resource="companies" action="create" showFallback={false}>
+                  <Button onClick={onNew} className="bg-blue-600 hover:bg-blue-700">
+                    <Plus className="w-4 h-4 mr-2" />
+                    Criar Primeira Empresa
+                  </Button>
+                </PermissionGuard>
               )}
             </CardContent>
           </Card>
@@ -189,9 +196,11 @@ export default function CompanyListReal({ onBack, onEdit, onView, onNew }: Compa
                       <Button size="sm" variant="outline" onClick={() => onView(company)}>
                         <Eye className="w-4 h-4" />
                       </Button>
-                      <Button size="sm" variant="outline" onClick={() => onEdit(company)}>
-                        <Edit className="w-4 h-4" />
-                      </Button>
+                      <PermissionGuard resource="companies" action="update" showFallback={false}>
+                        <Button size="sm" variant="outline" onClick={() => onEdit(company)}>
+                          <Edit className="w-4 h-4" />
+                        </Button>
+                      </PermissionGuard>
                     </div>
                   </div>
                 </CardContent>

@@ -19,16 +19,29 @@ interface ApiResponse<T> {
 
 class ApiService {
   private token: string | null = null;
+  private currentCompanyId: string | null = null;
 
   constructor() {
     // Recuperar token do localStorage
     this.token = localStorage.getItem('auth_token');
+    
+    // Recuperar empresa atual
+    const savedCompany = localStorage.getItem('company');
+    if (savedCompany) {
+      try {
+        const company = JSON.parse(savedCompany);
+        this.currentCompanyId = company.id;
+      } catch (error) {
+        console.error('Erro ao carregar empresa:', error);
+      }
+    }
   }
 
   private getHeaders(): HeadersInit {
     const headers: HeadersInit = {
       'Content-Type': 'application/json',
       'API-Version': 'v1',
+      'X-Company-ID': this.currentCompanyId || '',
     };
 
     if (this.token) {
@@ -38,12 +51,33 @@ class ApiService {
     return headers;
   }
 
+  private addCompanyFilter(endpoint: string): string {
+    // Para super admin, não adicionar filtro automático
+    const savedUser = localStorage.getItem('user');
+    if (savedUser) {
+      try {
+        const user = JSON.parse(savedUser);
+        if (user.role === 'super_admin') {
+          return endpoint;
+        }
+      } catch (error) {
+        console.error('Erro ao verificar usuário:', error);
+      }
+    }
+    
+    // Para outros usuários, adicionar filtro de empresa
+    const separator = endpoint.includes('?') ? '&' : '?';
+    return `${endpoint}${separator}companyId=${this.currentCompanyId}`;
+  }
   private async request<T>(
     endpoint: string,
     options: RequestInit = {}
   ): Promise<ApiResponse<T>> {
     try {
-      console.log(`🔗 Fazendo requisição para: ${API_BASE_URL}${endpoint}`);
+      const filteredEndpoint = this.addCompanyFilter(endpoint);
+      console.log(`🔗 Fazendo requisição para: ${API_BASE_URL}${filteredEndpoint}`);
+      console.log(`🏢 Empresa atual: ${this.currentCompanyId}`);
+      
       const response = await fetch(`${API_BASE_URL}${endpoint}`, {
         ...options,
         mode: 'cors',
@@ -83,6 +117,18 @@ class ApiService {
 
     if (response.data) {
       this.token = response.data.token;
+      
+      // Atualizar empresa atual baseada no usuário
+      const savedCompany = localStorage.getItem('company');
+      if (savedCompany) {
+        try {
+          const company = JSON.parse(savedCompany);
+          this.currentCompanyId = company.id;
+        } catch (error) {
+          console.error('Erro ao carregar empresa:', error);
+        }
+      }
+      
       localStorage.setItem('auth_token', response.data.token);
       localStorage.setItem('user', JSON.stringify(response.data.user));
     }
@@ -92,8 +138,14 @@ class ApiService {
 
   logout(): void {
     this.token = null;
+    this.currentCompanyId = null;
     localStorage.removeItem('auth_token');
     localStorage.removeItem('user');
+    localStorage.removeItem('company');
+  }
+
+  updateCompanyContext(companyId: string): void {
+    this.currentCompanyId = companyId;
   }
 
   getCurrentUser(): { id: number; email: string; name: string; role: string } | null {
@@ -112,9 +164,15 @@ class ApiService {
   }
 
   async createCompany(company: unknown): Promise<unknown> {
+    // Adicionar companyId automaticamente
+    const companyWithOwner = {
+      ...company,
+      ownerCompanyId: this.currentCompanyId
+    };
+    
     const response = await this.request<unknown>('/companies', {
       method: 'POST',
-      body: JSON.stringify(company),
+      body: JSON.stringify(companyWithOwner),
     });
     return response.data;
   }
@@ -140,9 +198,15 @@ class ApiService {
   }
 
   async createContact(contact: unknown): Promise<unknown> {
+    // Adicionar companyId automaticamente
+    const contactWithCompany = {
+      ...contact,
+      companyId: this.currentCompanyId
+    };
+    
     const response = await this.request<unknown>('/contacts', {
       method: 'POST',
-      body: JSON.stringify(contact),
+      body: JSON.stringify(contactWithCompany),
     });
     return response.data;
   }
@@ -165,7 +229,35 @@ class ApiService {
   async getBestMatches(): Promise<ApiResponse<unknown[]>> {
     return this.request('/matching/best-matches');
   }
+
+  // User management methods
+  async getCompanyUsers(): Promise<unknown[]> {
+    const response = await this.request<unknown[]>('/users');
+    return response.data || [];
+  }
+
+  async inviteUser(userData: { email: string; name: string; role: string }): Promise<unknown> {
+    const userWithCompany = {
+      ...userData,
+      companyId: this.currentCompanyId
+    };
+    
+    const response = await this.request<unknown>('/users/invite', {
+      method: 'POST',
+      body: JSON.stringify(userWithCompany),
+    });
+    return response.data;
+  }
+
+  async updateUserRole(userId: string, role: string): Promise<unknown> {
+    const response = await this.request<unknown>(`/users/${userId}/role`, {
+      method: 'PUT',
+      body: JSON.stringify({ role }),
+    });
+    return response.data;
+  }
 }
 
 export const apiService = new ApiService();
+import { useAuth } from '@/components/auth';
 export default apiService;

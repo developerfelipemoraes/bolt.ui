@@ -6,6 +6,7 @@ import ContactWizard from '@/components/ContactWizard';
 import ContactListReal from '@/components/ContactListReal';
 import ContactProfile from '@/components/ContactProfile';
 import { ContactData } from '@/types/contact';
+import { PermissionGuard } from '@/components/ui/permission-guard';
 
 export default function ContactManagement() {
   const navigate = useNavigate();
@@ -43,55 +44,61 @@ export default function ContactManagement() {
       <Route 
         path="/" 
         element={
-          <ContactListReal
-            onBack={handleBack}
-            onNew={handleNewContact}
-            onEdit={handleEditContact}
-            onView={handleViewContact}
-          />
+          <PermissionGuard resource="contacts" action="read">
+            <ContactListReal
+              onBack={handleBack}
+              onNew={handleNewContact}
+              onEdit={handleEditContact}
+              onView={handleViewContact}
+            />
+          </PermissionGuard>
         } 
       />
       <Route 
         path="/new" 
         element={
-          <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50">
-            <div className="max-w-6xl mx-auto p-6">
-              <Button 
-                variant="outline" 
-                onClick={() => navigate('/contacts')}
-                className="mb-6"
-              >
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Voltar à Lista
-              </Button>
-              <ContactWizard
-                onComplete={handleContactComplete}
-                onCancel={handleContactCancel}
-              />
+          <PermissionGuard resource="contacts" action="create">
+            <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50">
+              <div className="max-w-6xl mx-auto p-6">
+                <Button 
+                  variant="outline" 
+                  onClick={() => navigate('/contacts')}
+                  className="mb-6"
+                >
+                  <ArrowLeft className="w-4 h-4 mr-2" />
+                  Voltar à Lista
+                </Button>
+                <ContactWizard
+                  onComplete={handleContactComplete}
+                  onCancel={handleContactCancel}
+                />
+              </div>
             </div>
-          </div>
+          </PermissionGuard>
         } 
       />
       <Route 
         path="/edit" 
         element={
-          <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50">
-            <div className="max-w-6xl mx-auto p-6">
-              <Button 
-                variant="outline" 
-                onClick={() => navigate('/contacts')}
-                className="mb-6"
-              >
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Voltar à Lista
-              </Button>
-              <ContactWizard
-                onComplete={handleContactComplete}
-                onCancel={handleContactCancel}
-                initialData={selectedContact || undefined}
-              />
+          <PermissionGuard resource="contacts" action="update">
+            <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50">
+              <div className="max-w-6xl mx-auto p-6">
+                <Button 
+                  variant="outline" 
+                  onClick={() => navigate('/contacts')}
+                  className="mb-6"
+                >
+                  <ArrowLeft className="w-4 h-4 mr-2" />
+                  Voltar à Lista
+                </Button>
+                <ContactWizard
+                  onComplete={handleContactComplete}
+                  onCancel={handleContactCancel}
+                  initialData={selectedContact || undefined}
+                />
+              </div>
             </div>
-          </div>
+          </PermissionGuard>
         } 
       />
       <Route 

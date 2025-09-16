@@ -1,34 +1,39 @@
 import React from 'react';
 import { useAuth } from './AuthContext';
 import LoginComponent from './LoginComponent';
+import { PermissionAction } from '@/types/auth';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
-  requiredPermission?: string;
+  requiredResource?: string;
+  requiredAction?: PermissionAction;
   requiredRole?: string;
   allowedCompanies?: string[];
 }
 
 export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   children,
-  requiredPermission,
+  requiredResource,
+  requiredAction = 'read',
   requiredRole,
   allowedCompanies
 }) => {
-  const { user, isAuthenticated, hasPermission, login } = useAuth();
+  const { user, company, isAuthenticated, hasPermission, login } = useAuth();
 
   // Se não estiver autenticado, mostrar tela de login
-  if (!isAuthenticated || !user) {
-    return <LoginComponent onLogin={login} />;
+  if (!isAuthenticated || !user || !company) {
+    return <LoginComponent onLogin={(userData, companyData) => login(userData, companyData)} />;
   }
 
   // Verificar permissão específica
-  if (requiredPermission && !hasPermission(requiredPermission)) {
+  if (requiredResource && !hasPermission(requiredResource, requiredAction)) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
           <h2 className="text-2xl font-bold text-gray-900 mb-2">Acesso Negado</h2>
-          <p className="text-gray-600">Você não tem permissão para acessar esta área.</p>
+          <p className="text-gray-600">
+            Você não tem permissão para {requiredAction} {requiredResource}.
+          </p>
         </div>
       </div>
     );
@@ -47,7 +52,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   }
 
   // Verificar empresas permitidas
-  if (allowedCompanies && !allowedCompanies.includes(user.company)) {
+  if (allowedCompanies && !allowedCompanies.includes(user.companyId)) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">

@@ -4,5 +4,5 @@ export { AuthProvider, useAuth } from './AuthContext';
 export { ProtectedRoute } from './ProtectedRoute';
 export { UserMenu } from './UserMenu';
 
-// Export types
-export type { default as AuthContext } from './AuthContext';
+// Export auth types
+export type { AuthContextType } from '@/types/auth';
