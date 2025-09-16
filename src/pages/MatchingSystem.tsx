@@ -3,7 +3,7 @@ import { Routes, Route, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
 import MatchingSystemReal from '@/components/MatchingSystemReal';
-import CompanyContactMatching from '@/components/CompanyContactMatching';
+import { SmartMatchingComponent } from '@/components/CRMComponents';
 
 export default function MatchingSystem() {
   const navigate = useNavigate();
@@ -101,7 +101,7 @@ export default function MatchingSystem() {
           <Route 
             path="/company-contacts" 
             element={
-              <CompanyContactMatching
+              <SmartMatchingComponent
                 onBack={() => navigate('/matching')}
               />
             } 
