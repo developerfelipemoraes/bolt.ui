@@ -20,7 +20,8 @@ import {
   Building2,
   User,
   Clock,
-  CheckCircle
+  CheckCircle,
+  Activity
 } from 'lucide-react';
 
 interface Opportunity {

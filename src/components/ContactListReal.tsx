@@ -65,16 +65,10 @@ export default function ContactListReal({ onBack, onEdit, onView, onNew }: Conta
     try {
       setLoading(true);
       const response = await apiService.getContacts();
-      if (response.data) {
-        setContacts(response.data);
-      } else {
-        console.error('Erro ao carregar contatos:', response.error);
-        toast.error('Erro ao carregar contatos');
-        setContacts([]);
-      }
+      setContacts(Array.isArray(response) ? response : []);
     } catch (error) {
       console.error('Erro ao carregar contatos:', error);
-      toast.error('Erro ao carregar contatos');
+      toast.error('Erro de conexão - Verifique se o servidor backend está rodando em http://localhost:3001');
       setContacts([]);
     } finally {
       setLoading(false);
