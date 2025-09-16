@@ -28,7 +28,7 @@ export default function CompanyListReal({ onBack, onEdit, onView, onNew }: Compa
     try {
       setLoading(true);
       const data = await apiService.getCompanies();
-      setCompanies(data);
+      setCompanies(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error('Erro ao carregar empresas:', error);
       toast.error('Erro ao carregar empresas');

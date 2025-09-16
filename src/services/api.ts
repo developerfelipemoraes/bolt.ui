@@ -76,9 +76,6 @@ class ApiService {
 
   // Auth methods
   async login(email: string, password: string): Promise<ApiResponse<LoginResponse>> {
-    
-    console.log("aqui");
-    
     const response = await this.request<LoginResponse>('/auth/login', {
       method: 'POST',
       body: JSON.stringify({ email, password }),
@@ -109,22 +106,25 @@ class ApiService {
   }
 
   // Company methods
-  async getCompanies(): Promise<ApiResponse<unknown[]>> {
-    return this.request('/companies');
+  async getCompanies(): Promise<unknown[]> {
+    const response = await this.request<unknown[]>('/companies');
+    return response.data || [];
   }
 
-  async createCompany(company: unknown): Promise<ApiResponse<unknown>> {
-    return this.request('/companies', {
+  async createCompany(company: unknown): Promise<unknown> {
+    const response = await this.request<unknown>('/companies', {
       method: 'POST',
       body: JSON.stringify(company),
     });
+    return response.data;
   }
 
-  async updateCompany(id: string, company: unknown): Promise<ApiResponse<unknown>> {
-    return this.request(`/companies/${id}`, {
+  async updateCompany(id: string, company: unknown): Promise<unknown> {
+    const response = await this.request<unknown>(`/companies/${id}`, {
       method: 'PUT',
       body: JSON.stringify(company),
     });
+    return response.data;
   }
 
   async deleteCompany(id: string): Promise<ApiResponse<void>> {
@@ -134,22 +134,25 @@ class ApiService {
   }
 
   // Contact methods
-  async getContacts(): Promise<ApiResponse<unknown[]>> {
-    return this.request('/contacts');
+  async getContacts(): Promise<unknown[]> {
+    const response = await this.request<unknown[]>('/contacts');
+    return response.data || [];
   }
 
-  async createContact(contact: unknown): Promise<ApiResponse<unknown>> {
-    return this.request('/contacts', {
+  async createContact(contact: unknown): Promise<unknown> {
+    const response = await this.request<unknown>('/contacts', {
       method: 'POST',
       body: JSON.stringify(contact),
     });
+    return response.data;
   }
 
-  async updateContact(id: string, contact: unknown): Promise<ApiResponse<unknown>> {
-    return this.request(`/contacts/${id}`, {
+  async updateContact(id: string, contact: unknown): Promise<unknown> {
+    const response = await this.request<unknown>(`/contacts/${id}`, {
       method: 'PUT',
       body: JSON.stringify(contact),
     });
+    return response.data;
   }
 
   async deleteContact(id: string): Promise<ApiResponse<void>> {

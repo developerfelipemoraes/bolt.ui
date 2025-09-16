@@ -65,7 +65,7 @@ export default function ContactListReal({ onBack, onEdit, onView, onNew }: Conta
     try {
       setLoading(true);
       const response = await apiService.getContacts();
-      if (response.data) {
+      setContacts(Array.isArray(data) ? data : []);
         setContacts(response.data);
       } else {
         console.error('Erro ao carregar contatos:', response.error);
