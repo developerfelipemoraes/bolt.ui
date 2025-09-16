@@ -7,6 +7,7 @@ import { ArrowLeft, Users, Building2, Settings, Crown, Shield } from 'lucide-rea
 import { useAuth } from '@/components/auth';
 import { PermissionGuard } from '@/components/ui/permission-guard';
 import { UserManagement } from '@/components/admin/UserManagement';
+import { UserProfile } from '@/components/auth/UserProfile';
 import { CompanySelector } from '@/components/admin/CompanySelector';
 
 export default function AdminPanel() {
@@ -83,6 +84,48 @@ export default function AdminPanel() {
                   <div className={isSuperAdmin ? "lg:col-span-2" : "lg:col-span-3"}>
                     <UserManagement />
                   </div>
+                </div>
+
+                {/* User Profile Section */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  <UserProfile />
+                  
+                  {/* System Info */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2">
+                        <Settings className="h-5 w-5" />
+                        Informações do Sistema
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="grid grid-cols-2 gap-4 text-sm">
+                        <div>
+                          <span className="text-gray-600">Versão:</span>
+                          <p className="font-medium">v1.0.0</p>
+                        </div>
+                        <div>
+                          <span className="text-gray-600">Ambiente:</span>
+                          <p className="font-medium">Desenvolvimento</p>
+                        </div>
+                        <div>
+                          <span className="text-gray-600">Última Atualização:</span>
+                          <p className="font-medium">15/01/2024</p>
+                        </div>
+                        <div>
+                          <span className="text-gray-600">Storage:</span>
+                          <p className="font-medium">LocalStorage (Mock)</p>
+                        </div>
+                      </div>
+                      
+                      <div className="bg-blue-50 p-3 rounded-lg">
+                        <p className="text-sm text-blue-800">
+                          <strong>Modo Demo:</strong> Os dados estão sendo armazenados no localStorage. 
+                          Em produção, integre com um banco de dados real.
+                        </p>
+                      </div>
+                    </CardContent>
+                  </Card>
                 </div>
 
                 {/* Quick Actions */}
