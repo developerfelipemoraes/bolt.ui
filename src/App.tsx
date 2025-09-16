@@ -4,9 +4,11 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from '@/components/auth';
 import { ProtectedRoute } from '@/components/auth';
-import { VehicleManagement } from './pages/VehicleManagement';
-import AppMain from './pages/App';
-import CRMTest from './pages/CRMTest';
+import CRMDashboard from './pages/CRMDashboard';
+import ContactManagement from './pages/ContactManagement';
+import CompanyManagement from './pages/CompanyManagement';
+import VehicleManagement from './pages/VehicleManagement';
+import MatchingSystem from './pages/MatchingSystem';
 import NotFound from './pages/NotFound';
 
 const queryClient = new QueryClient();
@@ -22,27 +24,50 @@ const App = () => (
             <Route 
               path="/"               element={
                 <ProtectedRoute>
-                  <CRMTest />
+                  <CRMDashboard />
                 </ProtectedRoute>
               } 
             />
             <Route 
-              path="/crm/*" 
+              path="/dashboard" 
               element={
                 <ProtectedRoute>
-                  <CRMTest />
+                  <CRMDashboard />
                 </ProtectedRoute>
               } 
             />
             <Route 
-              path="/app" 
+              path="/contacts/*" 
               element={
                 <ProtectedRoute>
-                  <AppMain />
+                  <ContactManagement />
                 </ProtectedRoute>
               } 
             />
-            <Route path="/vehicles" element={<VehicleManagement />} />
+            <Route 
+              path="/companies/*" 
+              element={
+                <ProtectedRoute>
+                  <CompanyManagement />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/vehicles/*" 
+              element={
+                <ProtectedRoute>
+                  <VehicleManagement />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/matching/*" 
+              element={
+                <ProtectedRoute>
+                  <MatchingSystem />
+                </ProtectedRoute>
+              } 
+            />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

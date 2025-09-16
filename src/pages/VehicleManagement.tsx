@@ -1,80 +1,110 @@
 import React, { useState } from 'react';
-import { VehicleWizard } from '../components/VehicleWizard';
-import { VehicleList } from '../components/VehicleList';
-import { VehicleSummary } from '../components/VehicleSummary';
-import { Vehicle } from '../types/vehicle';
+import { Routes, Route, useNavigate } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import { ArrowLeft } from 'lucide-react';
+import { VehicleWizard } from '@/components/VehicleWizard';
+import { VehicleList } from '@/components/VehicleList';
+import { VehicleSummary } from '@/components/VehicleSummary';
+import { Vehicle } from '@/types/vehicle';
 
-type ViewMode = 'list' | 'add' | 'edit' | 'summary';
-
-export const VehicleManagement: React.FC = () => {
-  const [currentView, setCurrentView] = useState<ViewMode>('list');
-  const [editingVehicle, setEditingVehicle] = useState<Vehicle | null>(null);
+export default function VehicleManagement() {
+  const navigate = useNavigate();
+  const [selectedVehicle, setSelectedVehicle] = useState<Vehicle | null>(null);
   const [summaryData, setSummaryData] = useState<Partial<Vehicle> | null>(null);
 
-  const handleAddVehicle = () => {
-    setEditingVehicle(null);
-    setCurrentView('add');
+  const handleBack = () => {
+    navigate('/dashboard');
+  };
+
+  const handleNewVehicle = () => {
+    navigate('/vehicles/new');
   };
 
   const handleEditVehicle = (vehicle: Vehicle) => {
-    setEditingVehicle(vehicle);
-    setCurrentView('edit');
+    setSelectedVehicle(vehicle);
+    navigate('/vehicles/edit');
   };
 
-  const handleWizardComplete = (vehicleData: Vehicle) => {
+  const handleVehicleComplete = (vehicleData: Vehicle) => {
     setSummaryData(vehicleData);
-    setCurrentView('summary');
+    navigate('/vehicles/summary');
   };
 
-  const handleBackToList = () => {
-    setCurrentView('list');
-    setEditingVehicle(null);
-    setSummaryData(null);
+  const handleVehicleCancel = () => {
+    navigate('/vehicles');
   };
 
-  const handleViewSummary = (vehicleData: Partial<Vehicle>) => {
-    setSummaryData(vehicleData);
-    setCurrentView('summary');
-  };
-
-  switch (currentView) {
-    case 'add':
-    case 'edit':
-      return (
-        <VehicleWizard
-          onComplete={handleWizardComplete}
-          onCancel={handleBackToList}
-        />
-      );
-    
-    case 'summary':
-      return (
-        <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 p-4">
-          <div className="max-w-6xl mx-auto">
-            <div className="mb-6 flex items-center justify-between">
-              <h1 className="text-3xl font-bold text-gray-900">
-                Veículo Cadastrado com Sucesso!
-              </h1>
-              <button
-                onClick={handleBackToList}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+  return (
+    <Routes>
+      <Route 
+        path="/" 
+        element={
+          <VehicleList
+            onAdd={handleNewVehicle}
+            onEdit={handleEditVehicle}
+          />
+        } 
+      />
+      <Route 
+        path="/new" 
+        element={
+          <div className="min-h-screen bg-gradient-to-br from-purple-50 to-indigo-50">
+            <div className="max-w-6xl mx-auto p-6">
+              <Button 
+                variant="outline" 
+                onClick={() => navigate('/vehicles')}
+                className="mb-6"
               >
+                <ArrowLeft className="w-4 h-4 mr-2" />
                 Voltar à Lista
-              </button>
+              </Button>
+              <VehicleWizard
+                onComplete={handleVehicleComplete}
+                onCancel={handleVehicleCancel}
+              />
             </div>
-            
-            {summaryData && <VehicleSummary vehicleData={summaryData} />}
           </div>
-        </div>
-      );
-    
-    case 'list':
-    default:
-      return (
-        <VehicleList
-          onAdd={handleAddVehicle}
-          onEdit={handleEditVehicle}
-        />
-      );
-  }
-};
+        } 
+      />
+      <Route 
+        path="/edit" 
+        element={
+          <div className="min-h-screen bg-gradient-to-br from-purple-50 to-indigo-50">
+            <div className="max-w-6xl mx-auto p-6">
+              <Button 
+                variant="outline" 
+                onClick={() => navigate('/vehicles')}
+                className="mb-6"
+              >
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Voltar à Lista
+              </Button>
+              <VehicleWizard
+                onComplete={handleVehicleComplete}
+                onCancel={handleVehicleCancel}
+              />
+            </div>
+          </div>
+        } 
+      />
+      <Route 
+        path="/summary" 
+        element={
+          <div className="min-h-screen bg-gradient-to-br from-purple-50 to-indigo-50">
+            <div className="max-w-6xl mx-auto p-6">
+              <div className="mb-6 flex items-center justify-between">
+                <h1 className="text-3xl font-bold text-gray-900">
+                  Veículo Cadastrado com Sucesso!
+                </h1>
+                <Button onClick={() => navigate('/vehicles')}>
+                  Voltar à Lista
+                </Button>
+              </div>
+              {summaryData && <VehicleSummary vehicleData={summaryData} />}
+            </div>
+          </div>
+        } 
+      />
+    </Routes>
+  );
+}
