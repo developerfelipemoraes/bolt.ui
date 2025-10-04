@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Search, Edit, Plus, Truck, Calendar, MapPin } from 'lucide-react';
+import { Search, CreditCard as Edit, Plus, Truck, Calendar, MapPin } from 'lucide-react';
 import { vehicleEditorApi } from '../services/vehicleEditorApi';
 import { toast } from 'sonner';
 
