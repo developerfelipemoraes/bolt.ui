@@ -8,23 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { 
-  Users, 
-  Plus, 
-  Edit, 
-  Trash2, 
-  Mail, 
-  Shield,
-  Building2,
-  Crown,
-  UserCheck,
-  UserX,
-  Key,
-  Eye,
-  EyeOff,
-  RefreshCw,
-  Activity
-} from 'lucide-react';
+import { Users, Plus, CreditCard as Edit, Trash2, Mail, Shield, Building2, Crown, UserCheck, UserX, Key, Eye, EyeOff, RefreshCw, Activity } from 'lucide-react';
 import { LogOut } from 'lucide-react';
 import { useAuth } from '@/components/auth';
 import { User, UserRole, Company } from '@/types/auth';
