@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Edit, Trash2, ExternalLink, ArrowUpDown } from 'lucide-react';
+import { CreditCard as Edit, Trash2, ExternalLink, ArrowUpDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
