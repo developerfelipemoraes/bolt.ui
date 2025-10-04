@@ -18,5 +18,13 @@ export default defineConfig(({ mode }) => ({
   },
   optimizeDeps: {
     include: ['xlsx', 'fuse.js', 'jspdf', 'html2canvas'],
+    esbuildOptions: {
+      target: 'esnext',
+    },
+  },
+  build: {
+    commonjsOptions: {
+      include: [/xlsx/, /node_modules/],
+    },
   },
 }));
