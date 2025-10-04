@@ -1,5 +1,5 @@
 import * as XLSX from 'xlsx';
-import { NormalizedVehicle, formatBRL, getOptionalsList } from './data-normalizers';
+import { NormalizedVehicle, getOptionalsList } from './data-normalizers';
 
 export interface ExportColumn {
   header: string;

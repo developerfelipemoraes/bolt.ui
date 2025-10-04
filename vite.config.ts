@@ -16,4 +16,7 @@ export default defineConfig(({ mode }) => ({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  optimizeDeps: {
+    include: ['xlsx', 'fuse.js', 'jspdf', 'html2canvas'],
+  },
 }));
