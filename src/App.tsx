@@ -15,6 +15,7 @@ import ReportsAnalytics from './pages/ReportsAnalytics';
 import TasksActivities from './pages/TasksActivities';
 import NotFound from './pages/NotFound';
 import AdminPanel from './pages/AdminPanel';
+import { VehicleEditorModule } from './modules/vehicle-editor';
 
 const queryClient = new QueryClient();
 
@@ -44,6 +45,7 @@ const App = () => (
               <Route path="tasks/*" element={<TasksActivities />} />
               <Route path="admin/*" element={<AdminPanel />} />
             </Route>
+            <Route path="/vehicle-editor/*" element={<VehicleEditorModule />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
