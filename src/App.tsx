@@ -16,6 +16,7 @@ import TasksActivities from './pages/TasksActivities';
 import NotFound from './pages/NotFound';
 import AdminPanel from './pages/AdminPanel';
 import { VehicleEditorModule } from './modules/vehicle-editor';
+import { VehicleSearchExportModule } from './features/vehicle-search-export';
 
 const queryClient = new QueryClient();
 
@@ -46,6 +47,7 @@ const App = () => (
               <Route path="admin/*" element={<AdminPanel />} />
             </Route>
             <Route path="/vehicle-editor/*" element={<VehicleEditorModule />} />
+            <Route path="/vehicles/search/*" element={<VehicleSearchExportModule />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

@@ -1,0 +1,176 @@
+[
+  {
+    "Sku": "VH001",
+    "StatusVeiculo": "Disponível",
+    "ProductIdentification": {
+      "Title": "Ônibus Rodoviário Mercedes-Benz O-500",
+      "Price": {
+        "$numberDecimal": "450000.00"
+      }
+    },
+    "Location": {
+      "City": "São Paulo",
+      "State": "SP"
+    },
+    "VehicleData": {
+      "AvailableQuantity": 2,
+      "FabricationYear": 2020,
+      "ModelYear": 2021
+    },
+    "Supplier": {
+      "ContactName": "João Silva",
+      "CompanyName": "Transportes Silva LTDA",
+      "Phone": "(11) 98765-4321"
+    },
+    "ChassisInfo": {
+      "ChassisManufacturer": "Mercedes-Benz",
+      "ChassisModel": "O-500 RSD 6x2",
+      "BodyManufacturer": "Marcopolo",
+      "BodyModel": "Paradiso G7 1600 LD"
+    },
+    "Category": {
+      "Name": "Ônibus"
+    },
+    "Subcategory": {
+      "Name": "Rodoviário"
+    },
+    "Media": {
+      "TreatedPhotos": [
+        "https://images.pexels.com/photos/1592384/pexels-photo-1592384.jpeg"
+      ],
+      "OriginalPhotos": []
+    },
+    "Optionals": {
+      "AirConditioning": true,
+      "Bathroom": true,
+      "Usb": true,
+      "PackageHolder": true,
+      "SoundSystem": true,
+      "Monitor": true,
+      "Wifi": true,
+      "GlasType": 0,
+      "Curtain": true,
+      "Accessibility": true
+    },
+    "SecondaryInfo": {
+      "Description": "Ônibus rodoviário em excelente estado. Bancos Reclináveis com sistema de segurança avançado. Página Aurovel: https://aurovel.com.br/veiculo/vh001"
+    },
+    "UpdatedAt": "2025-10-01T10:30:00Z"
+  },
+  {
+    "Sku": "VH002",
+    "StatusVeiculo": "Disponível",
+    "ProductIdentification": {
+      "Title": "Micro-ônibus Iveco Daily",
+      "Price": {
+        "$numberDecimal": "180000.00"
+      }
+    },
+    "Location": {
+      "City": "Curitiba",
+      "State": "PR"
+    },
+    "VehicleData": {
+      "AvailableQuantity": 1,
+      "FabricationYear": 2019,
+      "ModelYear": 2020
+    },
+    "Supplier": {
+      "ContactName": "Maria Santos",
+      "CompanyName": "Turismo Paraná",
+      "Phone": "(41) 99876-5432"
+    },
+    "ChassisInfo": {
+      "ChassisManufacturer": "Iveco",
+      "ChassisModel": "Daily 4x2",
+      "BodyManufacturer": "Neobus",
+      "BodyModel": "Thunder Plus"
+    },
+    "Category": {
+      "Name": "Micro-ônibus"
+    },
+    "Subcategory": {
+      "Name": "Urbano"
+    },
+    "Media": {
+      "TreatedPhotos": [
+        "https://images.pexels.com/photos/574324/pexels-photo-574324.jpeg"
+      ],
+      "OriginalPhotos": []
+    },
+    "Optionals": {
+      "AirConditioning": true,
+      "Bathroom": false,
+      "Usb": true,
+      "PackageHolder": false,
+      "SoundSystem": true,
+      "Monitor": false,
+      "Wifi": false,
+      "GlasType": 1,
+      "Curtain": false,
+      "Accessibility": true
+    },
+    "SecondaryInfo": {
+      "Description": "Micro-ônibus ideal para turismo urbano com capacidade para 30 passageiros. Página Aurovel: https://aurovel.com.br/veiculo/vh002"
+    },
+    "UpdatedAt": "2025-09-28T14:20:00Z"
+  },
+  {
+    "Sku": "VH003",
+    "StatusVeiculo": "Reservado",
+    "ProductIdentification": {
+      "Title": "Ônibus Urbano Volvo B270F",
+      "Price": {
+        "$numberDecimal": "320000.00"
+      }
+    },
+    "Location": {
+      "City": "Rio de Janeiro",
+      "State": "RJ"
+    },
+    "VehicleData": {
+      "AvailableQuantity": 3,
+      "FabricationYear": 2021,
+      "ModelYear": 2022
+    },
+    "Supplier": {
+      "ContactName": "Pedro Oliveira",
+      "CompanyName": "Transportes Carioca",
+      "Phone": "(21) 98765-1234"
+    },
+    "ChassisInfo": {
+      "ChassisManufacturer": "Volvo",
+      "ChassisModel": "B270F 4x2",
+      "BodyManufacturer": "Caio",
+      "BodyModel": "Mondego H"
+    },
+    "Category": {
+      "Name": "Ônibus"
+    },
+    "Subcategory": {
+      "Name": "Urbano"
+    },
+    "Media": {
+      "TreatedPhotos": [
+        "https://images.pexels.com/photos/241316/pexels-photo-241316.jpeg"
+      ],
+      "OriginalPhotos": []
+    },
+    "Optionals": {
+      "AirConditioning": false,
+      "Bathroom": false,
+      "Usb": false,
+      "PackageHolder": false,
+      "SoundSystem": false,
+      "Monitor": false,
+      "Wifi": false,
+      "GlasType": 1,
+      "Curtain": false,
+      "Accessibility": true
+    },
+    "SecondaryInfo": {
+      "Description": "Ônibus urbano de alto desempenho para transporte público. Eficiência e conforto garantidos."
+    },
+    "UpdatedAt": "2025-10-02T09:15:00Z"
+  }
+]
